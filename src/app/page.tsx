@@ -2,64 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccessToken, reissueToken } from '@/utils/auth';
+import { getAccessToken } from '@/utils/auth';
 import GroupJoinRequestsSection from './profile/GroupJoinRequestsSection';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 function HomeContent() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ProtectedRoute에서 이미 인증을 처리했으므로 여기서는 단순히 렌더링만
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        console.log('=== 인증 확인 시작 ===');
-        const currentToken = getAccessToken();
-        console.log('현재 토큰 존재 여부:', !!currentToken);
-        console.log('현재 토큰 앞 20자:', currentToken?.substring(0, 20) + '...');
-        
-        if (!currentToken) {
-          console.log('토큰이 없어서 재발급 시도...');
-          await reissueToken();
-          console.log('토큰 재발급 성공');
-        } else {
-          console.log('기존 토큰 사용');
-        }
-      } catch (error) {
-        console.error('인증 확인 실패:', error);
-        setError(error instanceof Error ? error.message : '인증에 문제가 발생했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  const handleRetry = async () => {
-    const checkAuth = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        if (!getAccessToken()) {
-          await reissueToken();
-        }
-      } catch (error) {
-        console.error('인증 확인 실패:', error);
-        setError(error instanceof Error ? error.message : '인증에 문제가 발생했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    await checkAuth();
-  };
+    console.log('홈 컴포넌트 로드됨');
+  }, []);
 
   if (isLoading) {
     return (
@@ -77,7 +33,7 @@ function HomeContent() {
       <ErrorDisplay 
         error={error}
         title="홈을 불러올 수 없어요"
-        onRetry={handleRetry}
+        onRetry={() => setError(null)}
         retryText="다시 시도하기"
         backLink="/login"
         backText="로그인 페이지로"

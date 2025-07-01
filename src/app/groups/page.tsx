@@ -8,7 +8,6 @@ import { useState, useEffect } from 'react';
 import { GroupListResponse } from '@/types/group';
 import { fetchWithToken } from '@/utils/auth';
 import EditGroupNameModal from '@/components/EditGroupNameModal';
-import { useRouter } from 'next/navigation';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { createApiUrl } from '@/utils/api';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -22,7 +21,6 @@ function GroupsPageContent() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     fetchGroups();

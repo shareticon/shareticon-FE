@@ -33,7 +33,7 @@ function CreateGroupPageContent() {
       const response = await fetchWithToken(createApiUrl('/group'), {
         method: 'POST',
         body: JSON.stringify({
-          groupTitleAlias: formData.name.trim()
+          title: formData.name.trim()
         }),
       });
 

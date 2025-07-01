@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccessToken } from '@/utils/auth';
+import { getAccessToken, reissueToken } from '@/utils/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,32 +11,47 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = getAccessToken();
-      
-      if (!token) {
-        // 토큰이 없으면 즉시 로그인 페이지로 리다이렉션
+    const checkAuth = async () => {
+      try {
+        setIsCheckingAuth(true);
+        
+        console.log('=== ProtectedRoute 인증 확인 시작 ===');
+        const token = getAccessToken();
+        console.log('현재 토큰 존재 여부:', !!token);
+        
+        if (!token) {
+          console.log('토큰이 없어서 reissue 시도...');
+          // 토큰이 없으면 reissue 시도
+          await reissueToken();
+          console.log('reissue 성공');
+          setIsAuthenticated(true);
+        } else {
+          console.log('기존 토큰 사용');
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error('인증 확인 실패:', error);
+        // reissue 실패시 로그인 페이지로 이동
         router.replace('/login');
-        return;
+      } finally {
+        setIsCheckingAuth(false);
       }
-      
-      // 토큰이 있으면 인증된 상태로 설정
-      setIsAuthenticated(true);
     };
 
     checkAuth();
   }, [router]);
 
-  // 인증 상태가 확인되지 않았으면 로딩 화면 또는 fallback 표시
-  if (isAuthenticated === null) {
+  // 인증 확인 중이거나 인증 상태가 확인되지 않았으면 로딩 화면
+  if (isCheckingAuth || isAuthenticated === null) {
     return fallback || (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <p className="mt-4 text-gray-600">인증 확인 중...</p>
         </div>
       </div>
     );

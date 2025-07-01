@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 import { VoucherList } from '@/components/VoucherList';
 import { AddVoucherModal } from '@/components/AddVoucherModal';
 import { ArrowLeftIcon, UserPlusIcon, PlusIcon } from '@heroicons/react/24/outline';
@@ -57,7 +56,6 @@ interface VoucherResponse {
 
 function GroupDetailPageContent() {
   const params = useParams();
-  const router = useRouter();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

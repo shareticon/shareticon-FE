@@ -1,11 +1,15 @@
 'use client';
 
 import GiftBarcodeIcon from '@/components/GiftBarcodeIcon';
+import { getApiBaseUrl } from '@/utils/api';
 
 export default function LoginPage() {
   const handleKakaoLogin = () => {
-    // 카카오 로그인 콜백 URL로 직접 이동
-    window.location.href = 'https://api.shareticon.site/login/oauth2/code/kakao';
+    // 환경에 따른 카카오 로그인 URL 생성
+    const apiBaseUrl = getApiBaseUrl();
+    const kakaoLoginUrl = `${apiBaseUrl.replace('/api', '')}/login/oauth2/code/kakao`;
+    console.log('카카오 로그인 URL:', kakaoLoginUrl);
+    window.location.href = kakaoLoginUrl;
   };
 
   return (
