@@ -2,10 +2,10 @@
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // 클라이언트 사이드에서는 개발 환경일 때 프록시 사용
-    return process.env.NODE_ENV === 'development' ? '/api' : 'https://api.shareticon.site';
+    return process.env.NODE_ENV === 'development' ? '/api' : 'https://api.shareticon.site/api';
   }
   // 서버 사이드에서는 항상 직접 API 서버 호출
-  return 'https://api.shareticon.site';
+  return 'https://api.shareticon.site/api';
 };
 
 // 액세스 토큰을 저장할 변수

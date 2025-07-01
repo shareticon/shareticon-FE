@@ -7,7 +7,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://api.shareticon.site/:path*',
+        destination: 'https://api.shareticon.site/api/:path*',
       },
     ];
   },

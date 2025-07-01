@@ -3,7 +3,8 @@
 import { PencilSquareIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { removeAccessToken } from '@/utils/auth';
+import { removeAccessToken, fetchWithToken } from '@/utils/auth';
+import { createApiUrl } from '@/utils/api';
 import EditUserNicknameModal from '@/components/EditUserNicknameModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
 
@@ -28,18 +29,7 @@ export default function ProfilePage() {
       setIsLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('accessToken');
-      const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-      
-      const response = await fetch('https://api.shareticon.site/profile', {
-        headers: {
-          'Authorization': authHeader,
-        },
-      });
+      const response = await fetchWithToken(createApiUrl('/profile'));
       
       if (!response.ok) {
         if (response.status === 401) {
@@ -66,19 +56,9 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      const token = localStorage.getItem('accessToken');
       
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
-      const response = await fetch('https://api.shareticon.site/logout', {
+      const response = await fetchWithToken(createApiUrl('/logout'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
-        },
       });
 
       if (response.ok) {
@@ -102,14 +82,8 @@ export default function ProfilePage() {
 
   const handleEditNickname = async (newNickname: string) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      const response = await fetch('https://api.shareticon.site/profile', {
+      const response = await fetchWithToken(createApiUrl('/profile'), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
         body: JSON.stringify({ newNickname: newNickname }),
       });
       if (!response.ok) throw new Error('닉네임 변경 실패');

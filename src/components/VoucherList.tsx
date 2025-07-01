@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PhotoIcon, XMarkIcon, ChevronUpIcon, ChevronDownIcon, FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { fetchWithToken } from '@/utils/auth';
+import { createApiUrl } from '@/utils/api';
 
 interface Voucher {
   id: number;
@@ -142,17 +144,8 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     }
     if (!window.confirm('이 쿠폰을 사용완료로 변경하시겠습니까?')) return;
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-      const response = await fetch(`https://api.shareticon.site/vouchers/group/${groupId}/voucher/${voucherId}`, {
+      const response = await fetchWithToken(createApiUrl(`/vouchers/group/${groupId}/voucher/${voucherId}`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
-        },
         body: JSON.stringify({ status: 'USED' }),
       });
       if (!response.ok) {
@@ -180,17 +173,8 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     }
     if (!window.confirm('이 쿠폰을 사용취소하시겠습니까?')) return;
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-      const response = await fetch(`https://api.shareticon.site/vouchers/group/${groupId}/voucher/${voucherId}`, {
+      const response = await fetchWithToken(createApiUrl(`/vouchers/group/${groupId}/voucher/${voucherId}`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
-        },
         body: JSON.stringify({ status: 'AVAILABLE' }),
       });
       if (!response.ok) {
@@ -214,16 +198,8 @@ export const VoucherList: React.FC<VoucherListProps> = ({
   const handleDeleteVoucher = async (voucherId: number) => {
     if (!window.confirm('이 기프티콘을 삭제하시겠습니까?\n삭제된 기프티콘은 복구할 수 없습니다.')) return;
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-      const response = await fetch(`https://api.shareticon.site/vouchers/${voucherId}`, {
+      const response = await fetchWithToken(createApiUrl(`/vouchers/${voucherId}`), {
         method: 'DELETE',
-        headers: {
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
-        },
       });
       if (!response.ok) {
         throw new Error('기프티콘 삭제에 실패했습니다.');

@@ -9,6 +9,8 @@ import { ArrowLeftIcon, UserPlusIcon, PlusIcon } from '@heroicons/react/24/outli
 import Link from 'next/link';
 import InviteModal from '@/components/InviteModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import { fetchWithToken } from '@/utils/auth';
+import { createApiUrl } from '@/utils/api';
 
 interface Voucher {
   id: number;
@@ -80,7 +82,7 @@ export default function GroupDetailPage() {
         ...(cursor && { cursorId: cursor.toString() })
       });
 
-      const apiUrl = `https://api.shareticon.site/vouchers/${params.id}?${queryParams}`;
+      const apiUrl = createApiUrl(`/vouchers/${params.id}?${queryParams}`);
       console.log('API 요청 URL:', apiUrl);
       console.log('Authorization 토큰:', token);
 
@@ -172,7 +174,7 @@ export default function GroupDetailPage() {
         })
       );
 
-      const apiUrl = `https://api.shareticon.site/vouchers`;
+      const apiUrl = createApiUrl(`/vouchers`);
       console.log('기프티콘 추가 요청 URL:', apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -224,14 +226,7 @@ export default function GroupDetailPage() {
           return;
         }
         
-        const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-        console.log('Authorization 헤더:', authHeader.substring(0, 20) + '...');
-        
-        const response = await fetch('https://api.shareticon.site/profile', {
-          headers: {
-            'Authorization': authHeader,
-          },
-        });
+        const response = await fetchWithToken(createApiUrl('/profile'));
         
         console.log('프로필 API 응답 상태:', response.status);
         

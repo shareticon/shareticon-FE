@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
+import { fetchWithToken } from '@/utils/auth';
+import { createApiUrl } from '@/utils/api';
 
 interface JoinRequest {
   applyUserId: number;
@@ -23,18 +25,8 @@ const GroupJoinRequests: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem('accessToken');
-        const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-        if (!token) {
-          setError('로그인이 필요합니다.');
-          setLoading(false);
-          return;
-        }
-        const response = await fetch('https://api.shareticon.site/group/join', {
-          headers: {
-            'Authorization': authHeader,
-          },
-        });
+        
+        const response = await fetchWithToken(createApiUrl('/group/join'));
         if (!response.ok) {
           throw new Error('가입 신청 내역을 불러오지 못했습니다.');
         }
@@ -89,14 +81,8 @@ const GroupJoinRequests: React.FC = () => {
 
   const handleAccept = async (groupId: number, userId: number) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      const response = await fetch(`https://api.shareticon.site/group/${groupId}/user/${userId}?status=APPROVED`, {
+      const response = await fetchWithToken(createApiUrl(`/group/${groupId}/user/${userId}?status=APPROVED`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
       });
       if (!response.ok) throw new Error('수락 처리에 실패했습니다.');
       setGroupRequests(prev => prev.map(g =>
@@ -111,14 +97,8 @@ const GroupJoinRequests: React.FC = () => {
 
   const handleReject = async (groupId: number, userId: number) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      const response = await fetch(`https://api.shareticon.site/group/${groupId}/user/${userId}?status=REJECTED`, {
+      const response = await fetchWithToken(createApiUrl(`/group/${groupId}/user/${userId}?status=REJECTED`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
       });
       if (!response.ok) throw new Error('거절 처리에 실패했습니다.');
       setGroupRequests(prev => prev.map(g =>
