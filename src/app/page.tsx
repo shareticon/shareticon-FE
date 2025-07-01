@@ -1,20 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getAccessToken } from '@/utils/auth';
 import GroupJoinRequestsSection from './profile/GroupJoinRequestsSection';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 function HomeContent() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // ProtectedRoute에서 이미 인증을 처리했으므로 여기서는 단순히 렌더링만
   useEffect(() => {
-    console.log('홈 컴포넌트 로드됨');
+    // 컴포넌트 초기화
   }, []);
 
   if (isLoading) {

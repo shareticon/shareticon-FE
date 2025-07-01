@@ -1,4 +1,4 @@
-import { getApiBaseUrl, getEnvironment } from './api';
+import { getApiBaseUrl } from './api';
 
 // 액세스 토큰을 저장할 변수
 let accessToken: string | null = null;

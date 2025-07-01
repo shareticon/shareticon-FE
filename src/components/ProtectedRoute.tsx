@@ -19,18 +19,13 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
       try {
         setIsCheckingAuth(true);
         
-        console.log('=== ProtectedRoute 인증 확인 시작 ===');
         const token = getAccessToken();
-        console.log('현재 토큰 존재 여부:', !!token);
         
         if (!token) {
-          console.log('토큰이 없어서 reissue 시도...');
           // 토큰이 없으면 reissue 시도
           await reissueToken();
-          console.log('reissue 성공');
           setIsAuthenticated(true);
         } else {
-          console.log('기존 토큰 사용');
           setIsAuthenticated(true);
         }
       } catch (error) {
