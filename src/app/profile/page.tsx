@@ -7,6 +7,7 @@ import { removeAccessToken, fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 import EditUserNicknameModal from '@/components/EditUserNicknameModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface UserProfile {
   userId: number;
@@ -16,7 +17,7 @@ interface UserProfile {
   ownedVoucherCount: number;
 }
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -32,10 +33,6 @@ export default function ProfilePage() {
       const response = await fetchWithToken(createApiUrl('/profile'));
       
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
         throw new Error('프로필 정보를 불러오지 못했습니다.');
       }
       
@@ -183,5 +180,13 @@ export default function ProfilePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfilePageContent />
+    </ProtectedRoute>
   );
 } 

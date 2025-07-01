@@ -11,6 +11,7 @@ import InviteModal from '@/components/InviteModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Voucher {
   id: number;
@@ -54,7 +55,7 @@ interface VoucherResponse {
   empty: boolean;
 }
 
-export default function GroupDetailPage() {
+function GroupDetailPageContent() {
   const params = useParams();
   const router = useRouter();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -72,10 +73,6 @@ export default function GroupDetailPage() {
   const fetchVouchers = async (cursor: number | null = null) => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
 
       const queryParams = new URLSearchParams({
         pageSize: pageSize.toString(),
@@ -88,7 +85,7 @@ export default function GroupDetailPage() {
 
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+          'Authorization': token?.startsWith('Bearer ') ? token : `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -96,11 +93,6 @@ export default function GroupDetailPage() {
       console.log('API 응답 상태:', response.status);
       
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        
         const errorData = await response.text();
         console.error('API 에러 응답:', errorData);
         
@@ -151,10 +143,6 @@ export default function GroupDetailPage() {
   const handleAddVoucher = async (formData: FormData) => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
 
       // formData에서 필요한 값 추출
       const image = formData.get('image');
@@ -180,7 +168,7 @@ export default function GroupDetailPage() {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+          'Authorization': token?.startsWith('Bearer ') ? token : `Bearer ${token}`,
         },
         body: newFormData,
       });
@@ -188,11 +176,6 @@ export default function GroupDetailPage() {
       console.log('기프티콘 추가 응답 상태:', response.status);
 
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-
         const errorData = await response.text();
         console.error('기프티콘 추가 에러 응답:', errorData);
         
@@ -332,5 +315,13 @@ export default function GroupDetailPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function GroupDetailPage() {
+  return (
+    <ProtectedRoute>
+      <GroupDetailPageContent />
+    </ProtectedRoute>
   );
 } 

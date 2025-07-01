@@ -5,6 +5,7 @@ import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // 임시 데이터
 const mockGroupRequests = {
@@ -36,7 +37,7 @@ const mockGroupRequests = {
   '3': []
 };
 
-export default function GroupRequestsPage() {
+function GroupRequestsPageContent() {
   const { id } = useParams();
   const groupId = Array.isArray(id) ? id[0] : id;
   const [requests, setRequests] = useState(mockGroupRequests[groupId as keyof typeof mockGroupRequests] || []);
@@ -124,5 +125,13 @@ export default function GroupRequestsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GroupRequestsPage() {
+  return (
+    <ProtectedRoute>
+      <GroupRequestsPageContent />
+    </ProtectedRoute>
   );
 } 

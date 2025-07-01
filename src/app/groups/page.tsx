@@ -11,14 +11,17 @@ import EditGroupNameModal from '@/components/EditGroupNameModal';
 import { useRouter } from 'next/navigation';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { createApiUrl } from '@/utils/api';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
-export default function GroupsPage() {
+function GroupsPageContent() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [groups, setGroups] = useState<GroupListResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<GroupListResponse | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,10 +47,48 @@ export default function GroupsPage() {
     }
   };
 
-  const handleJoinSubmit = (code: string) => {
-    // TODO: API 연동 후 실제 그룹 참여 로직 구현
-    console.log('참여 코드:', code);
-    setIsJoinModalOpen(false);
+  const handleJoinSubmit = async (code: string) => {
+    try {
+      setIsJoining(true);
+      setJoinError(null);
+      
+      console.log('그룹 참여 요청:', code);
+      
+      const response = await fetchWithToken(createApiUrl('/group/join'), {
+        method: 'POST',
+        body: JSON.stringify({
+          inviteCode: code
+        }),
+      });
+
+      console.log('그룹 참여 응답 상태:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('그룹 참여 에러 응답:', errorData);
+        
+        if (response.status === 400) {
+          throw new Error('잘못된 초대 코드입니다.');
+        } else if (response.status === 409) {
+          throw new Error('이미 참여한 그룹입니다.');
+        } else {
+          throw new Error(`그룹 참여에 실패했습니다. (상태 코드: ${response.status})`);
+        }
+      }
+
+      const joinResult = await response.json();
+      console.log('그룹 참여 결과:', joinResult);
+      
+      // 성공 시 모달 닫기 및 그룹 목록 새로고침
+      setIsJoinModalOpen(false);
+      await fetchGroups();
+      
+    } catch (error) {
+      console.error('그룹 참여 실패:', error);
+      setJoinError(error instanceof Error ? error.message : '그룹 참여 중 오류가 발생했습니다.');
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const handleEditGroupName = async (newName: string) => {
@@ -55,16 +96,12 @@ export default function GroupsPage() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
 
       const response = await fetch(createApiUrl(`/group/${selectedGroup.groupId}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+          'Authorization': token?.startsWith('Bearer ') ? token : `Bearer ${token}`
         },
         body: JSON.stringify({
           newGroupTitleAlias: newName
@@ -72,10 +109,6 @@ export default function GroupsPage() {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
         throw new Error('그룹명 수정에 실패했습니다.');
       }
 
@@ -131,7 +164,10 @@ export default function GroupsPage() {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setIsJoinModalOpen(true)}
+                  onClick={() => {
+                    setIsJoinModalOpen(true);
+                    setJoinError(null);
+                  }}
                   className="inline-flex items-center border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
                 >
                   <UserPlusIcon className="w-5 h-5 mr-1" />
@@ -155,7 +191,10 @@ export default function GroupsPage() {
               <p className="text-gray-600 mb-4">아직 참여 중인 그룹이 없습니다.</p>
               <div className="flex gap-2 justify-center">
                 <button
-                  onClick={() => setIsJoinModalOpen(true)}
+                  onClick={() => {
+                    setIsJoinModalOpen(true);
+                    setJoinError(null);
+                  }}
                   className="text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
                   그룹 참여하기
@@ -182,8 +221,13 @@ export default function GroupsPage() {
 
         <JoinGroupModal
           isOpen={isJoinModalOpen}
-          onClose={() => setIsJoinModalOpen(false)}
+          onClose={() => {
+            setIsJoinModalOpen(false);
+            setJoinError(null);
+          }}
           onSubmit={handleJoinSubmit}
+          error={joinError}
+          isLoading={isJoining}
         />
 
         {selectedGroup && (
@@ -199,5 +243,13 @@ export default function GroupsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function GroupsPage() {
+  return (
+    <ProtectedRoute>
+      <GroupsPageContent />
+    </ProtectedRoute>
   );
 } 

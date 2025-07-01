@@ -6,18 +6,34 @@ import { useState } from 'react';
 interface JoinGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (code: string) => void;
+  onSubmit: (code: string) => Promise<void>;
+  error?: string | null;
+  isLoading?: boolean;
 }
 
-export default function JoinGroupModal({ isOpen, onClose, onSubmit }: JoinGroupModalProps) {
+export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, isLoading }: JoinGroupModalProps) {
   const [inviteCode, setInviteCode] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(inviteCode);
-    setInviteCode('');
+    if (!inviteCode.trim() || isLoading) return;
+    
+    try {
+      await onSubmit(inviteCode.trim());
+      setInviteCode(''); // 성공 시에만 초기화
+    } catch (error) {
+      // 에러는 부모 컴포넌트에서 처리
+      console.error('그룹 참여 실패:', error);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isLoading) {
+      setInviteCode('');
+      onClose();
+    }
   };
 
   return (
@@ -26,8 +42,9 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit }: JoinGroupM
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-indigo-900">그룹 참여하기</h2>
           <button
-            onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+            onClick={handleClose}
+            disabled={isLoading}
+            className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -38,23 +55,37 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit }: JoinGroupM
             초대 코드를 입력하여 그룹에 참여하세요.
           </p>
           
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+          
           <div>
             <input
               type="text"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               placeholder="초대 코드 입력"
-              className="w-full px-4 py-3 font-mono text-lg tracking-wider border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 font-mono text-lg tracking-wider border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
               maxLength={10}
+              disabled={isLoading}
             />
           </div>
 
           <button
             type="submit"
-            disabled={inviteCode.length !== 10}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            disabled={inviteCode.length !== 10 || isLoading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
-            참여하기
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                참여 중...
+              </>
+            ) : (
+              '참여하기'
+            )}
           </button>
         </form>
       </div>

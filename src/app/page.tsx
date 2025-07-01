@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { getAccessToken, reissueToken } from '@/utils/auth';
 import GroupJoinRequestsSection from './profile/GroupJoinRequestsSection';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,5 +126,13 @@ export default function Home() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <ProtectedRoute>
+      <HomeContent />
+    </ProtectedRoute>
   );
 }
