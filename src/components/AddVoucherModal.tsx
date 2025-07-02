@@ -170,7 +170,6 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
                           name="image-upload"
                           type="file"
                           accept="image/*"
-                          capture="environment"
                           className="sr-only"
                           onChange={handleImageChange}
                           required
@@ -179,7 +178,7 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
                       <p className="pl-1">또는 드래그 앤 드롭</p>
                     </div>
                     <p className="text-xs leading-5 text-gray-600 mt-2">
-                      PNG, JPG, GIF (최대 10MB)
+                      카메라 또는 앨범에서 선택 · PNG, JPG, GIF (최대 10MB)
                     </p>
                   </div>
                 )}
