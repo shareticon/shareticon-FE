@@ -54,24 +54,31 @@ function ProfilePageContent() {
     try {
       setIsLoggingOut(true);
       
-      const response = await fetchWithToken(createApiUrl('/logout'), {
-        method: 'POST',
-      });
+      // 백엔드에 로그아웃 요청 (실패해도 클라이언트 토큰은 정리)
+      try {
+        const response = await fetchWithToken(createApiUrl('/logout'), {
+          method: 'POST',
+        });
 
-      if (response.ok) {
-        removeAccessToken();
-        router.push('/login');
-      } else {
-        if (response.status === 401) {
-          removeAccessToken();
-          router.push('/login');
-          return;
+        if (!response.ok) {
+          console.warn(`로그아웃 API 요청 실패: ${response.status}`);
         }
-        throw new Error(`로그아웃 실패: ${response.status}`);
+      } catch (apiError) {
+        console.warn('로그아웃 API 요청 실패:', apiError);
+        // API 실패해도 계속 진행
       }
+
+      // 항상 클라이언트 측 토큰 정리 (API 성공/실패 관계없이)
+      removeAccessToken();
+      
+      // 페이지 이동
+      router.push('/login');
+      
     } catch (error: unknown) {
       console.error('로그아웃 에러:', error);
-      alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
+      // 에러가 발생해도 토큰 정리는 수행
+      removeAccessToken();
+      router.push('/login');
     } finally {
       setIsLoggingOut(false);
     }

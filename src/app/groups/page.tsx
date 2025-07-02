@@ -20,6 +20,7 @@ function GroupsPageContent() {
   const [selectedGroup, setSelectedGroup] = useState<GroupListResponse | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [joinSuccessMessage, setJoinSuccessMessage] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ function GroupsPageContent() {
     try {
       setIsJoining(true);
       setJoinError(null);
+      setJoinSuccessMessage(null);
       
       console.log('그룹 참여 요청:', code);
       
@@ -65,21 +67,55 @@ function GroupsPageContent() {
         const errorData = await response.text();
         console.error('그룹 참여 에러 응답:', errorData);
         
-        if (response.status === 400) {
-          throw new Error('잘못된 초대 코드입니다.');
-        } else if (response.status === 409) {
-          throw new Error('이미 참여한 그룹입니다.');
-        } else {
-          throw new Error(`그룹 참여에 실패했습니다. (상태 코드: ${response.status})`);
+        // 백엔드에서 온 에러 메시지 파싱 시도
+        let errorMessage = '그룹 참여에 실패했습니다.';
+        
+        try {
+          // JSON 응답인 경우 파싱
+          const errorJson = JSON.parse(errorData);
+          if (errorJson.message) {
+            errorMessage = errorJson.message;
+          }
+        } catch {
+          console.log('JSON 파싱 실패, 텍스트 그대로 사용:', errorData);
+          // JSON이 아니면 텍스트 그대로 사용
+          if (errorData && errorData.trim()) {
+            errorMessage = errorData;
+          }
         }
+        
+        console.log('파싱된 에러 메시지:', errorMessage);
+        
+        // 에러 메시지를 그대로 사용
+        throw new Error(errorMessage);
       }
 
-      const joinResult = await response.json();
-      console.log('그룹 참여 결과:', joinResult);
+      // 응답 body가 있는지 확인 후 JSON 파싱
+      let joinResult = null;
+      const responseText = await response.text();
       
-      // 성공 시 모달 닫기 및 그룹 목록 새로고침
-      setIsJoinModalOpen(false);
+      if (responseText.trim()) {
+        try {
+          joinResult = JSON.parse(responseText);
+          console.log('그룹 참여 결과:', joinResult);
+                 } catch {
+           console.log('JSON 파싱 실패, 텍스트 응답:', responseText);
+        }
+      } else {
+        console.log('빈 응답 body (성공)');
+      }
+      
+      // 성공 메시지 표시
+      setJoinSuccessMessage('그룹 가입 신청이 완료되었습니다! 승인을 기다려주세요.');
+      
+      // 그룹 목록 새로고침
       await fetchGroups();
+      
+      // 2초 후 모달 자동 닫기
+      setTimeout(() => {
+        setIsJoinModalOpen(false);
+        setJoinSuccessMessage(null);
+      }, 2000);
       
     } catch (error) {
       console.error('그룹 참여 실패:', error);
@@ -165,6 +201,7 @@ function GroupsPageContent() {
                   onClick={() => {
                     setIsJoinModalOpen(true);
                     setJoinError(null);
+                    setJoinSuccessMessage(null);
                   }}
                   className="inline-flex items-center border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
                 >
@@ -192,6 +229,7 @@ function GroupsPageContent() {
                   onClick={() => {
                     setIsJoinModalOpen(true);
                     setJoinError(null);
+                    setJoinSuccessMessage(null);
                   }}
                   className="text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
@@ -222,9 +260,11 @@ function GroupsPageContent() {
           onClose={() => {
             setIsJoinModalOpen(false);
             setJoinError(null);
+            setJoinSuccessMessage(null);
           }}
           onSubmit={handleJoinSubmit}
           error={joinError}
+          successMessage={joinSuccessMessage}
           isLoading={isJoining}
         />
 

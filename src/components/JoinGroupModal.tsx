@@ -1,6 +1,6 @@
 'use client';
 
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 interface JoinGroupModalProps {
@@ -8,10 +8,11 @@ interface JoinGroupModalProps {
   onClose: () => void;
   onSubmit: (code: string) => Promise<void>;
   error?: string | null;
+  successMessage?: string | null;
   isLoading?: boolean;
 }
 
-export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, isLoading }: JoinGroupModalProps) {
+export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, successMessage, isLoading }: JoinGroupModalProps) {
   const [inviteCode, setInviteCode] = useState('');
 
   if (!isOpen) return null;
@@ -55,7 +56,14 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, isLoa
             초대 코드를 입력하여 그룹에 참여하세요.
           </p>
           
-          {error && (
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center">
+              <CheckCircleIcon className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />
+              <p className="text-green-700 text-sm">{successMessage}</p>
+            </div>
+          )}
+          
+          {error && !successMessage && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
@@ -69,24 +77,36 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, isLoa
               placeholder="초대 코드 입력"
               className="w-full px-4 py-3 font-mono text-lg tracking-wider border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
               maxLength={10}
-              disabled={isLoading}
+              disabled={isLoading || !!successMessage}
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={inviteCode.length !== 10 || isLoading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                참여 중...
-              </>
-            ) : (
-              '참여하기'
-            )}
-          </button>
+          {!successMessage && (
+            <button
+              type="submit"
+              disabled={inviteCode.length !== 10 || isLoading}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  참여 중...
+                </>
+              ) : (
+                '참여하기'
+              )}
+            </button>
+          )}
+
+          {successMessage && (
+            <button
+              type="button"
+              onClick={handleClose}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+            >
+              확인
+            </button>
+          )}
         </form>
       </div>
     </div>

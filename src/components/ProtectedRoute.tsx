@@ -23,14 +23,21 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
         
         if (!token) {
           // 토큰이 없으면 reissue 시도
-          await reissueToken();
-          setIsAuthenticated(true);
+          try {
+            await reissueToken();
+            setIsAuthenticated(true);
+          } catch {
+            console.log('토큰 재발급 실패, 로그인 페이지로 이동');
+            // reissue에서 이미 토큰 정리와 리다이렉트를 수행하므로 여기서는 state만 설정
+            setIsAuthenticated(false);
+          }
         } else {
           setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('인증 확인 실패:', error);
-        // reissue 실패시 로그인 페이지로 이동
+        setIsAuthenticated(false);
+        // 로그인 페이지로 리다이렉트
         router.replace('/login');
       } finally {
         setIsCheckingAuth(false);
