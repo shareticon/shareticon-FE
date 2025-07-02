@@ -169,7 +169,9 @@ function ProfilePageContent() {
                   <p className="text-2xl font-semibold text-indigo-900 mt-1">{user ? user.joinGroupCount : '-'}</p>
                 </div>
                 <div className="bg-indigo-50 p-4 rounded-lg text-center">
-                  <p className="text-sm text-gray-600">내가 등록한 기프티콘</p>
+                  <p className="text-sm text-gray-600">
+                    내가 등록한<br className="sm:hidden" /> 기프티콘
+                  </p>
                   <p className="text-2xl font-semibold text-indigo-900 mt-1">{user ? user.ownedVoucherCount : '-'}</p>
                 </div>
               </div>

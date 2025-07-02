@@ -192,28 +192,30 @@ function GroupsPageContent() {
         <header className="sticky top-0 bg-gray-50 z-10 p-4">
           <div className="flex flex-col">
             <div className="flex justify-between items-center">
-              <div>
+              <div className="flex-1 min-w-0">
                 <h1 className="text-2xl font-bold text-[#1F2B88]">그룹 목록</h1>
-                <p className="text-sm text-gray-600 mt-1">함께 사용하는 기프티콘을 그룹으로 관리하세요</p>
+                <p className="text-sm text-gray-600 mt-1">그룹에 참여하여 기프티콘을 공유해 보세요</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => {
                     setIsJoinModalOpen(true);
                     setJoinError(null);
                     setJoinSuccessMessage(null);
                   }}
-                  className="inline-flex items-center border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                  className="inline-flex items-center text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                  title="그룹 참여하기"
                 >
-                  <UserPlusIcon className="w-5 h-5 mr-1" />
-                  <span>참여하기</span>
+                  <UserPlusIcon className="w-5 h-5" />
+                  <span className="ml-1 hidden sm:inline">참여하기</span>
                 </button>
                 <Link
                   href="/groups/create"
-                  className="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  title="새 그룹 만들기"
                 >
-                  <PlusIcon className="w-5 h-5 mr-1" />
-                  <span>새 그룹</span>
+                  <PlusIcon className="w-5 h-5" />
+                  <span className="ml-1 hidden sm:inline">새 그룹</span>
                 </Link>
               </div>
             </div>
@@ -233,14 +235,14 @@ function GroupsPageContent() {
                   }}
                   className="text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
-                  그룹 참여하기
+                  참여하기
                 </button>
                 <span className="text-gray-400">또는</span>
                 <Link
                   href="/groups/create"
                   className="text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
-                  새 그룹 만들기
+                  새 그룹
                 </Link>
               </div>
             </div>

@@ -4,9 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "rm -rf .next && next dev",
     "build": "next build",
+    "build:clean": "rm -rf .next && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .next",
+    "clean:all": "rm -rf .next node_modules package-lock.json && npm install",
+    "reset": "pkill -f 'next dev' 2>/dev/null || true && rm -rf .next && next dev"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

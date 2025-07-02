@@ -226,12 +226,12 @@ export const VoucherList: React.FC<VoucherListProps> = ({
         <div className="relative flex-shrink-0 bg-white rounded-l-lg rounded-r-none" ref={filterRef}>
           <button
             onClick={() => setFilterOpen(v => !v)}
-            className={`inline-flex items-center gap-1 px-4 h-10 rounded-l-lg rounded-r-none border-0 border-r border-gray-200 bg-white text-gray-700 text-xs font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filterOpen ? 'z-30' : ''}`}
-            style={{ minWidth: 72 }}
+            className={`inline-flex items-center gap-1 px-2 sm:px-4 h-10 rounded-l-lg rounded-r-none border-0 border-r border-gray-200 bg-white text-gray-700 text-xs font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filterOpen ? 'z-30' : ''}`}
+            style={{ minWidth: 56 }}
             aria-label="필터 열기"
           >
             <FunnelIcon className="w-4 h-4 text-gray-500" />
-            <span>필터</span>
+            <span className="hidden sm:inline">필터</span>
             <ChevronDownIcon className={`w-4 h-4 ml-0.5 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
           </button>
           {filterOpen && (
@@ -254,22 +254,23 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             </div>
           )}
         </div>
-        <div className="flex gap-2 items-center bg-gray-50 h-10 px-4 min-w-0 overflow-x-auto scrollbar-hide flex-1 rounded-r-lg rounded-l-none">
+        <div className="flex gap-1 sm:gap-2 items-center bg-gray-50 h-10 px-2 sm:px-4 min-w-0 overflow-x-auto scrollbar-hide flex-1 rounded-r-lg rounded-l-none">
           {Array.from(selectedStatuses).map(status => (
-            <span key={status} className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
+            <span key={status} className={`text-xs px-1.5 sm:px-2 py-1 rounded-full font-medium flex-shrink-0 ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
           ))}
-          <div className="flex-1" />
-          <div className="flex items-center gap-2 bg-gray-50 h-10 px-4 rounded-r-lg text-gray-600">
-            <span className="text-xs">만료일</span>
+          <div className="flex-1 min-w-2" />
+          <div className="flex items-center gap-1 sm:gap-2 bg-gray-50 h-10 px-2 sm:px-4 rounded-r-lg text-gray-600 flex-shrink-0">
+            <span className="text-xs hidden sm:inline">만료일</span>
             <button
               onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-              className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors text-xs h-8 px-2"
+              className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors text-xs h-8 px-1 sm:px-2"
             >
-              {sortOrder === 'asc' ? '오름차순' : '내림차순'}
+              <span className="text-xs hidden sm:inline">{sortOrder === 'asc' ? '오름차순' : '내림차순'}</span>
+              <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
               {sortOrder === 'asc' ? (
-                <ChevronUpIcon className="w-3.5 h-3.5" />
+                <ChevronUpIcon className="w-3.5 h-3.5 hidden sm:block" />
               ) : (
-                <ChevronDownIcon className="w-3.5 h-3.5" />
+                <ChevronDownIcon className="w-3.5 h-3.5 hidden sm:block" />
               )}
             </button>
           </div>
