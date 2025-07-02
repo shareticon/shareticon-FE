@@ -1,19 +1,31 @@
 'use client';
 
 import GiftBarcodeIcon from '@/components/GiftBarcodeIcon';
-import { getApiBaseUrl } from '@/utils/api';
 
 export default function LoginPage() {
   const handleKakaoLogin = () => {
-    // 환경에 따른 카카오 로그인 URL 생성
-    const apiBaseUrl = getApiBaseUrl();
+    // 환경변수 확인 및 디버깅
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const env = process.env.NEXT_PUBLIC_ENV;
     
-    // API URL에서 베이스 도메인 추출 (예: https://api.shareticon.site/api -> https://api.shareticon.site)
-    const baseUrl = apiBaseUrl.replace('/api', '');
-    const kakaoLoginUrl = `${baseUrl}/login/oauth2/code/kakao`;
+    console.log('=== 카카오 로그인 디버깅 ===');
+    console.log('NEXT_PUBLIC_API_BASE_URL:', apiBaseUrl);
+    console.log('NEXT_PUBLIC_ENV:', env);
+    console.log('window.location.hostname:', window.location.hostname);
     
-    console.log('현재 apiBaseUrl:', apiBaseUrl);
-    console.log('생성된 kakaoLoginUrl:', kakaoLoginUrl);
+    // 환경별 카카오 로그인 URL 명시적 설정
+    let kakaoLoginUrl: string;
+    
+    if (env === 'development' || window.location.hostname === 'localhost') {
+      // 로컬 개발 환경
+      kakaoLoginUrl = 'http://localhost:8080/login/oauth2/code/kakao';
+    } else {
+      // 배포 환경
+      kakaoLoginUrl = 'https://api.shareticon.site/login/oauth2/code/kakao';
+    }
+    
+    console.log('최종 카카오 로그인 URL:', kakaoLoginUrl);
+    console.log('===========================');
     
     window.location.href = kakaoLoginUrl;
   };
