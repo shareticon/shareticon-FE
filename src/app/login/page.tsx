@@ -7,8 +7,14 @@ export default function LoginPage() {
   const handleKakaoLogin = () => {
     // 환경에 따른 카카오 로그인 URL 생성
     const apiBaseUrl = getApiBaseUrl();
-    const kakaoLoginUrl = `${apiBaseUrl.replace('/api', '')}/login/oauth2/code/kakao`;
-    console.log('카카오 로그인 URL:', kakaoLoginUrl);
+    
+    // API URL에서 베이스 도메인 추출 (예: https://api.shareticon.site/api -> https://api.shareticon.site)
+    const baseUrl = apiBaseUrl.replace('/api', '');
+    const kakaoLoginUrl = `${baseUrl}/login/oauth2/code/kakao`;
+    
+    console.log('현재 apiBaseUrl:', apiBaseUrl);
+    console.log('생성된 kakaoLoginUrl:', kakaoLoginUrl);
+    
     window.location.href = kakaoLoginUrl;
   };
 
