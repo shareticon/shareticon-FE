@@ -196,9 +196,13 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 
   // 기프티콘 삭제 (API 연동)
   const handleDeleteVoucher = async (voucherId: number) => {
+    if (!groupId) {
+      alert('그룹 정보가 없습니다.');
+      return;
+    }
     if (!window.confirm('이 기프티콘을 삭제하시겠습니까?\n삭제된 기프티콘은 복구할 수 없습니다.')) return;
     try {
-      const response = await fetchWithToken(createApiUrl(`/vouchers/${voucherId}`), {
+      const response = await fetchWithToken(createApiUrl(`/vouchers/group/${groupId}/voucher/${voucherId}`), {
         method: 'DELETE',
       });
       if (!response.ok) {
