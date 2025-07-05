@@ -58,7 +58,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
   currentUserId,
 }) => {
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
-  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [modalVoucher, setModalVoucher] = useState<Voucher | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [selectedStatuses, setSelectedStatuses] = useState<Set<StatusFilter>>(new Set(['AVAILABLE', 'USED']));
   const [filterOpen, setFilterOpen] = useState(false);
@@ -288,7 +288,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
             onClick={() => {
               if (isValidImageUrl(voucher.presignedImage) && !imageErrors[voucher.id]) {
-                setModalImage(voucher.presignedImage);
+                setModalVoucher(voucher);
               }
             }}
           >
@@ -349,7 +349,9 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               )}
             </div>
             <div className="p-3">
-              <h3 className="font-medium text-gray-900 truncate">{voucher.name}</h3>
+              <h3 className="font-medium text-gray-900 truncate" title={voucher.name}>
+                {voucher.name}
+              </h3>
               <p className="text-sm text-gray-500 mt-1">
                 만료일: {voucher.expiration}
               </p>
@@ -369,13 +371,43 @@ export const VoucherList: React.FC<VoucherListProps> = ({
           </div>
         ))}
       </div>
-      {modalImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setModalImage(null)}>
-          <div className="relative bg-white rounded-lg shadow-xl max-w-xs w-full p-4 flex flex-col items-center" onClick={e => e.stopPropagation()}>
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={() => setModalImage(null)}>
+      {modalVoucher && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setModalVoucher(null)}>
+          <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors" onClick={() => setModalVoucher(null)}>
               <XMarkIcon className="w-6 h-6" />
             </button>
-            <img src={modalImage} alt="쿠폰 큰 이미지" className="w-full h-auto object-contain max-h-[70vh]" />
+            
+            <div className="mb-4">
+              <img src={modalVoucher.presignedImage} alt="기프티콘 이미지" className="w-full h-auto object-contain max-h-[60vh] rounded-lg" />
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 leading-6">
+                  {modalVoucher.name}
+                </h3>
+              </div>
+              
+              <div className="flex items-center justify-between py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-600">만료일</span>
+                <span className="text-sm font-medium text-gray-900">{modalVoucher.expiration}</span>
+              </div>
+              
+              <div className="flex items-center justify-between py-2 border-t border-gray-100">
+                <span className="text-sm text-gray-600">상태</span>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  modalVoucher.status === 'AVAILABLE' 
+                    ? 'bg-green-100 text-green-800'
+                    : modalVoucher.status === 'USED'
+                    ? 'bg-gray-100 text-gray-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {modalVoucher.status === 'AVAILABLE' ? '사용가능' : 
+                   modalVoucher.status === 'USED' ? '사용완료' : '만료됨'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}

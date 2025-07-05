@@ -112,16 +112,7 @@ const GroupJoinRequests: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <section>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="text-center py-8">
-            <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-2 text-gray-500">가입 신청 내역을 불러오는 중...</p>
-          </div>
-        </div>
-      </section>
-    );
+    return null; // 로딩 중일 때 아무것도 렌더링하지 않음
   }
   
   if (error) {
