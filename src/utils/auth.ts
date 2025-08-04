@@ -55,7 +55,7 @@ export const reissueToken = async (): Promise<string> => {
     if (!response.ok) {
       // 401 또는 403 에러 시 모든 토큰 정리 후 로그인 페이지로 이동
       if (response.status === 401 || response.status === 403) {
-        console.log('리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.');
+
         removeAccessToken();
         window.location.href = '/login';
         throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
@@ -109,7 +109,7 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}): Pr
 
     // 401 에러 처리 - 모든 토큰 정리 후 로그인 페이지로 이동
     if (response.status === 401) {
-      console.log('인증이 만료되었습니다. 다시 로그인해주세요.');
+
       removeAccessToken();
       window.location.href = '/login';
       throw new Error('인증이 만료되었습니다.');

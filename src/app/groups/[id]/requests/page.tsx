@@ -44,13 +44,13 @@ function GroupRequestsPageContent() {
 
   const handleAccept = async (requestId: string) => {
     // TODO: API 연동 후 실제 수락 로직 구현
-    console.log('수락:', requestId);
+
     setRequests(prev => prev.filter(req => req.id !== requestId));
   };
 
   const handleReject = async (requestId: string) => {
     // TODO: API 연동 후 실제 거절 로직 구현
-    console.log('거절:', requestId);
+
     setRequests(prev => prev.filter(req => req.id !== requestId));
   };
 

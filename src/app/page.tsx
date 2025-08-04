@@ -4,14 +4,91 @@ import { useEffect, useState } from 'react';
 import GroupJoinRequestsSection from './profile/GroupJoinRequestsSection';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import HorizontalVoucherCards from '@/components/HorizontalVoucherCards';
+import { fetchWithToken } from '@/utils/auth';
+import { createApiUrl } from '@/utils/api';
+
+interface Voucher {
+  id: number;
+  presignedImage: string;
+  status: 'AVAILABLE' | 'USED' | 'EXPIRED';
+  name: string;
+  expiration: string;
+  registeredUserId?: number;
+  isWishList?: boolean;
+  groupId?: number;
+}
+
+interface WishListItem {
+  voucherId: number;
+  presignedImage: string;
+  voucherName: string;
+  groupId: number;
+  registeredUserId: number;
+  expiration: string;
+  status: 'AVAILABLE' | 'USED' | 'EXPIRED';
+}
+
+interface WishListResponse {
+  content: WishListItem[];
+  size: number;
+  hasNext: boolean;
+}
 
 function HomeContent() {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ProtectedRoute에서 이미 인증을 처리했으므로 여기서는 단순히 렌더링만
+  // 찜한 기프티콘 상태 (실제 API에서 가져올 데이터)
+  const [favoriteVouchers, setFavoriteVouchers] = useState<Voucher[]>([]);
+  
+  // 만료 예정 기프티콘 (추후 API 연동 시 변경 예정)
+  const [expiringVouchers] = useState<Voucher[]>([]);
+
+  // 찜한 기프티콘 목록 조회
+  const fetchFavoriteVouchers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const queryParams = new URLSearchParams({
+        pageSize: '10' // 홈에서는 최대 10개까지만 표시
+      });
+
+      const response = await fetchWithToken(createApiUrl(`/wishList?${queryParams}`));
+      
+      if (!response.ok) {
+        throw new Error('찜한 기프티콘을 불러오는데 실패했습니다.');
+      }
+
+      const data: WishListResponse = await response.json();
+      
+      // API 응답을 Voucher 형태로 변환
+      const convertedVouchers: Voucher[] = data.content.map(item => ({
+        id: item.voucherId,
+        presignedImage: item.presignedImage,
+        status: item.status,
+        name: item.voucherName,
+        expiration: item.expiration,
+        registeredUserId: item.registeredUserId,
+        isWishList: true, // 찜 목록에서 가져온 데이터는 모두 찜한 상태
+        groupId: item.groupId
+      }));
+      
+      setFavoriteVouchers(convertedVouchers);
+      
+    } catch (e: unknown) {
+      console.error('찜한 기프티콘 조회 실패:', e);
+      // 에러가 발생해도 홈 화면은 정상적으로 표시하되, 찜한 기프티콘만 빈 배열로 설정
+      setFavoriteVouchers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 찜한 기프티콘 조회
   useEffect(() => {
-    // 컴포넌트 초기화
+    fetchFavoriteVouchers();
   }, []);
 
   if (isLoading) {
@@ -50,29 +127,19 @@ function HomeContent() {
 
         <main className="p-4">
           <section className="space-y-4">
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-indigo-900">찜한 기프티콘</h2>
-                <button className="text-indigo-600 hover:text-indigo-700 font-medium">
-                  전체보기
-                </button>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600 border border-gray-100">
-                아직 찜한 기프티콘이 없습니다
-              </div>
-            </div>
+            <HorizontalVoucherCards
+              vouchers={favoriteVouchers}
+              title="찜한 기프티콘"  
+              emptyMessage="아직 찜한 기프티콘이 없습니다"
+              onRefresh={fetchFavoriteVouchers}
+            />
 
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-indigo-900">만료 예정 기프티콘</h2>
-                <button className="text-indigo-600 hover:text-indigo-700 font-medium">
-                  전체보기
-                </button>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600 border border-gray-100">
-                만료 예정인 기프티콘이 없습니다
-              </div>
-            </div>
+            <HorizontalVoucherCards
+              vouchers={expiringVouchers}
+              title="만료 예정 기프티콘"
+              emptyMessage="만료 예정인 기프티콘이 없습니다"
+              onRefresh={fetchFavoriteVouchers}
+            />
 
             <GroupJoinRequestsSection />
           </section>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PhotoIcon, XMarkIcon, ChevronUpIcon, ChevronDownIcon, FunnelIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PhotoIcon, XMarkIcon, ChevronUpIcon, ChevronDownIcon, FunnelIcon, TrashIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 
@@ -11,6 +12,7 @@ interface Voucher {
   expiration: string;
   groupId?: number;
   registeredUserId?: number;
+  isWishList?: boolean;
 }
 
 interface VoucherListProps {
@@ -59,11 +61,67 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 }) => {
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [modalVoucher, setModalVoucher] = useState<Voucher | null>(null);
+  const [likedVouchers, setLikedVouchers] = useState<Record<number, boolean>>({});
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [selectedStatuses, setSelectedStatuses] = useState<Set<StatusFilter>>(new Set(['AVAILABLE', 'USED']));
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<HTMLDivElement>(null);
+
+  // 찜 상태 토글 함수
+  const toggleLike = async (voucherId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      // 현재 찜 상태를 즉시 UI에 반영 (Optimistic Update)
+      const currentLikedState = likedVouchers[voucherId] || false;
+      const newLikedState = !currentLikedState;
+      
+      setLikedVouchers(prev => ({
+        ...prev,
+        [voucherId]: newLikedState
+      }));
+
+      // 찜 토글 API 호출
+      const response = await fetchWithToken(
+        createApiUrl(`/wishList/group/${groupId}/voucher/${voucherId}`),
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // API 호출 실패 시 원래 상태로 되돌리기
+        setLikedVouchers(prev => ({
+          ...prev,
+          [voucherId]: currentLikedState
+        }));
+        throw new Error('찜 상태 변경에 실패했습니다.');
+      }
+
+    } catch (error) {
+      console.error('찜 상태 토글 실패:', error);
+    }
+  };
+
+  // 서버에서 받은 isWishList 값으로 찜 상태 초기화 (기존 로컬 변경사항 보존)
+  useEffect(() => {
+    setLikedVouchers(prev => {
+      const newState = { ...prev };
+      vouchers.forEach(voucher => {
+        // 로컬에서 변경된 적이 없는 경우에만 서버 값으로 설정
+        if (!(voucher.id in prev)) {
+          if (voucher.isWishList !== undefined) {
+            newState[voucher.id] = voucher.isWishList;
+          }
+        }
+      });
+      return newState;
+    });
+  }, [vouchers]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -97,17 +155,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     return () => observer.disconnect();
   }, [hasMore, isLoading, onLoadMore]);
 
-  // 디버깅용 로그
-  useEffect(() => {
-    console.log('=== VoucherList 디버깅 정보 ===');
-    console.log('현재 사용자 ID:', currentUserId);
-    console.log('기프티콘 목록:', vouchers.map(v => ({
-      id: v.id,
-      name: v.name,
-      registeredUserId: v.registeredUserId,
-      canDelete: currentUserId && v.registeredUserId === currentUserId
-    })));
-  }, [currentUserId, vouchers]);
+
 
   const handleImageError = (voucherId: number) => {
     setImageErrors(prev => ({ ...prev, [voucherId]: true }));
@@ -224,6 +272,8 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     );
   }
 
+
+
   return (
     <div className="p-4">
       <div className="sticky top-[88px] z-30 bg-white mb-3 w-full flex items-center min-h-[40px] border border-gray-200 shadow-sm rounded-lg">
@@ -285,7 +335,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
         {filteredAndSortedVouchers.map((voucher) => (
           <div
             key={voucher.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group"
             onClick={() => {
               if (isValidImageUrl(voucher.presignedImage) && !imageErrors[voucher.id]) {
                 setModalVoucher(voucher);
@@ -296,9 +346,6 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               {/* 등록한 사용자만 볼 수 있는 삭제 버튼 */}
               {(() => {
                 const canDelete = currentUserId && voucher.registeredUserId && currentUserId === voucher.registeredUserId;
-                if (canDelete) {
-                  console.log(`삭제 버튼 표시: ${voucher.name} (현재 사용자: ${currentUserId}, 등록자: ${voucher.registeredUserId})`);
-                }
                 return canDelete ? (
                   <button
                     onClick={e => { e.stopPropagation(); handleDeleteVoucher(voucher.id); }}
@@ -309,6 +356,23 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                   </button>
                 ) : null;
               })()}
+              
+              {/* 하트 아이콘 오버레이 */}
+              <div className={`absolute top-1 right-1 transition-opacity duration-200 z-30 ${
+                likedVouchers[voucher.id] ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              }`}>
+                <button
+                  onClick={(e) => toggleLike(voucher.id, e)}
+                  className="p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-colors shadow-sm"
+                >
+                  {likedVouchers[voucher.id] ? (
+                    <HeartIconSolid className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <HeartIcon className="w-4 h-4 text-gray-700 hover:text-red-500 transition-colors" />
+                  )}
+                </button>
+              </div>
+              
               {isValidImageUrl(voucher.presignedImage) && !imageErrors[voucher.id] ? (
                 <img
                   src={voucher.presignedImage}
@@ -383,10 +447,20 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             </div>
             
             <div className="space-y-3">
-              <div>
+              <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 leading-6">
                   {modalVoucher.name}
                 </h3>
+                <button
+                  onClick={(e) => toggleLike(modalVoucher.id, e)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  {likedVouchers[modalVoucher.id] ? (
+                    <HeartIconSolid className="w-6 h-6 text-red-500" />
+                  ) : (
+                    <HeartIcon className="w-6 h-6 text-gray-400 hover:text-red-500 transition-colors" />
+                  )}
+                </button>
               </div>
               
               <div className="flex items-center justify-between py-2 border-t border-gray-100">

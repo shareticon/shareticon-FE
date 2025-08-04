@@ -15,7 +15,7 @@ function AuthCallbackContent() {
         const token = searchParams.get('token');
         
         if (token) {
-          console.log('로그인 성공, 토큰 저장:', token.substring(0, 20) + '...');
+    
           setAccessToken(token);
           router.replace('/');
         } else {

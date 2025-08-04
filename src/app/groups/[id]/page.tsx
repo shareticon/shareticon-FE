@@ -18,6 +18,8 @@ interface Voucher {
   name: string;
   expiration: string;
   status: 'AVAILABLE' | 'USED' | 'EXPIRED';
+  registeredUserId: number;
+  isWishList: boolean;
 }
 
 interface GroupVouchers {
@@ -27,31 +29,11 @@ interface GroupVouchers {
   vouchers: Voucher[];
 }
 
-interface PageableSort {
-  empty: boolean;
-  sorted: boolean;
-  unsorted: boolean;
-}
-
-interface Pageable {
-  pageNumber: number;
-  pageSize: number;
-  sort: PageableSort;
-  offset: number;
-  paged: boolean;
-  unpaged: boolean;
-}
-
+// Spring Slice 응답이 아닌 커스텀 응답으로 변경
 interface VoucherResponse {
   content: GroupVouchers[];
-  pageable: Pageable;
-  first: boolean;
-  last: boolean;
   size: number;
-  number: number;
-  sort: PageableSort;
-  numberOfElements: number;
-  empty: boolean;
+  hasNext: boolean;
 }
 
 function GroupDetailPageContent() {
@@ -78,8 +60,6 @@ function GroupDetailPageContent() {
       });
 
       const apiUrl = createApiUrl(`/vouchers/${params.id}?${queryParams}`);
-      console.log('API 요청 URL:', apiUrl);
-      console.log('Authorization 토큰:', token);
 
       const response = await fetch(apiUrl, {
         headers: {
@@ -88,7 +68,7 @@ function GroupDetailPageContent() {
         },
       });
 
-      console.log('API 응답 상태:', response.status);
+
       
       if (!response.ok) {
         const errorData = await response.text();
@@ -100,7 +80,6 @@ function GroupDetailPageContent() {
       }
 
       const data: VoucherResponse = await response.json();
-      console.log('API 응답 데이터:', data);
       
       if (data.content.length > 0) {
         const groupData = data.content[0];
@@ -119,7 +98,7 @@ function GroupDetailPageContent() {
           setVouchers(prev => [...prev, ...processedVouchers]);
         }
         
-        setHasMore(!data.last);
+        setHasMore(data.hasNext);
         if (groupData.vouchers.length > 0) {
           setCursorId(groupData.vouchers[groupData.vouchers.length - 1].id);
         }
@@ -161,7 +140,6 @@ function GroupDetailPageContent() {
       );
 
       const apiUrl = createApiUrl(`/vouchers`);
-      console.log('기프티콘 추가 요청 URL:', apiUrl);
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -171,7 +149,7 @@ function GroupDetailPageContent() {
         body: newFormData,
       });
 
-      console.log('기프티콘 추가 응답 상태:', response.status);
+
 
       if (!response.ok) {
         const errorData = await response.text();
@@ -199,28 +177,17 @@ function GroupDetailPageContent() {
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        console.log('=== 프로필 API 호출 시작 ===');
-        console.log('토큰 존재 여부:', !!token);
         
         if (!token) {
-          console.log('토큰이 없어서 프로필 API 호출 중단');
           return;
         }
         
         const response = await fetchWithToken(createApiUrl('/profile'));
         
-        console.log('프로필 API 응답 상태:', response.status);
-        
         if (response.ok) {
           const userData = await response.json();
-          console.log('=== 프로필 API 응답 ===', userData);
           const userId = userData.userId || userData.id || userData.memberId;
-          console.log('추출된 사용자 ID:', userId);
           setCurrentUserId(userId);
-        } else {
-          console.error('프로필 API 응답 에러:', response.status, response.statusText);
-          const errorText = await response.text();
-          console.error('에러 내용:', errorText);
         }
       } catch (error) {
         console.error('사용자 정보 조회 실패:', error);

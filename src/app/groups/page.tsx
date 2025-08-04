@@ -52,7 +52,7 @@ function GroupsPageContent() {
       setJoinError(null);
       setJoinSuccessMessage(null);
       
-      console.log('그룹 참여 요청:', code);
+
       
       const response = await fetchWithToken(createApiUrl('/group/join'), {
         method: 'POST',
@@ -61,7 +61,7 @@ function GroupsPageContent() {
         }),
       });
 
-      console.log('그룹 참여 응답 상태:', response.status);
+
 
       if (!response.ok) {
         const errorData = await response.text();
@@ -77,14 +77,14 @@ function GroupsPageContent() {
             errorMessage = errorJson.message;
           }
         } catch {
-          console.log('JSON 파싱 실패, 텍스트 그대로 사용:', errorData);
+
           // JSON이 아니면 텍스트 그대로 사용
           if (errorData && errorData.trim()) {
             errorMessage = errorData;
           }
         }
         
-        console.log('파싱된 에러 메시지:', errorMessage);
+
         
         // 에러 메시지를 그대로 사용
         throw new Error(errorMessage);
@@ -97,12 +97,9 @@ function GroupsPageContent() {
       if (responseText.trim()) {
         try {
           joinResult = JSON.parse(responseText);
-          console.log('그룹 참여 결과:', joinResult);
-                 } catch {
-           console.log('JSON 파싱 실패, 텍스트 응답:', responseText);
+        } catch {
+          // JSON 파싱 실패 시 무시
         }
-      } else {
-        console.log('빈 응답 body (성공)');
       }
       
       // 성공 메시지 표시

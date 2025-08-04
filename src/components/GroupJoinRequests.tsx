@@ -34,15 +34,14 @@ const GroupJoinRequests: React.FC = () => {
         
         // 마지막으로 확인한 신청 목록 가져오기
         const lastCheckedRequests = JSON.parse(localStorage.getItem('lastCheckedGroupRequests') || '[]');
-        console.log('마지막 확인한 신청 ID들:', lastCheckedRequests);
-        console.log('현재 API 응답:', data);
+
         
         // 새로운 신청에 isNew 표식 추가
         const processedData = data.map((group: GroupRequest) => ({
           ...group,
           pendingMembers: group.pendingMembers.map(member => {
             const isNew = !lastCheckedRequests.includes(member.applyUserId);
-            console.log(`신청 ID ${member.applyUserId} (${member.applyUserNickname}): ${isNew ? 'NEW' : '기존'}`);
+
             return {
               ...member,
               isNew
@@ -72,7 +71,7 @@ const GroupJoinRequests: React.FC = () => {
       // 2초 후에 자동으로 확인 처리 (사용자가 NEW를 볼 시간을 줌)
       const timer = setTimeout(() => {
         localStorage.setItem('lastCheckedGroupRequests', JSON.stringify(currentRequestIds));
-        console.log('자동 확인 처리 완료:', currentRequestIds);
+
       }, 2000);
 
       return () => clearTimeout(timer);

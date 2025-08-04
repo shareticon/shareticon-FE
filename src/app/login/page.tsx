@@ -8,10 +8,7 @@ export default function LoginPage() {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     const env = process.env.NEXT_PUBLIC_ENV;
     
-    console.log('=== 카카오 로그인 디버깅 ===');
-    console.log('NEXT_PUBLIC_API_BASE_URL:', apiBaseUrl);
-    console.log('NEXT_PUBLIC_ENV:', env);
-    console.log('window.location.hostname:', window.location.hostname);
+
     
     // 환경별 카카오 로그인 URL 명시적 설정
     let kakaoLoginUrl: string;
@@ -24,8 +21,7 @@ export default function LoginPage() {
       kakaoLoginUrl = 'https://api.shareticon.site/login/oauth2/code/kakao';
     }
     
-    console.log('최종 카카오 로그인 URL:', kakaoLoginUrl);
-    console.log('===========================');
+
     
     window.location.href = kakaoLoginUrl;
   };

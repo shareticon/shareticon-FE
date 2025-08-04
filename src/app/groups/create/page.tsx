@@ -28,7 +28,7 @@ function CreateGroupPageContent() {
       setIsSubmitting(true);
       setError(null);
       
-      console.log('그룹 생성 요청:', formData);
+
       
       const response = await fetchWithToken(createApiUrl('/group'), {
         method: 'POST',
@@ -46,7 +46,6 @@ function CreateGroupPageContent() {
       }
 
       const createdGroup = await response.json();
-      console.log('생성된 그룹:', createdGroup);
       
       // 성공 시 그룹 목록 페이지로 이동
       router.push('/groups');

@@ -27,7 +27,7 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
             await reissueToken();
             setIsAuthenticated(true);
           } catch {
-            console.log('토큰 재발급 실패, 로그인 페이지로 이동');
+    
             // reissue에서 이미 토큰 정리와 리다이렉트를 수행하므로 여기서는 state만 설정
             setIsAuthenticated(false);
           }
