@@ -524,24 +524,18 @@ export const VoucherList: React.FC<VoucherListProps> = ({
       {/* 전체화면 이미지 뷰어 */}
       {fullscreenImage && (
         <div 
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4" 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 cursor-pointer" 
           onClick={() => setFullscreenImage(null)}
         >
           <div className="relative max-w-full max-h-full">
-            <button 
-              className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/50 rounded-full p-2 z-10"
-              onClick={() => setFullscreenImage(null)}
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
             <img 
               src={fullscreenImage} 
               alt="기프티콘 전체화면" 
-              className="max-w-full max-h-full object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-full object-contain rounded-lg cursor-pointer"
+              onClick={() => setFullscreenImage(null)}
             />
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/80 text-sm bg-black/50 px-3 py-1 rounded-full">
-              클릭하거나 ESC를 눌러 닫기
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/80 text-sm bg-black/50 px-3 py-1 rounded-full pointer-events-none">
+              이미지를 클릭하거나 ESC를 눌러 닫기
             </div>
           </div>
         </div>
