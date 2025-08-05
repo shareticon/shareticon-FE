@@ -30,6 +30,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
 }) => {
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [modalVoucher, setModalVoucher] = useState<Voucher | null>(null);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [likedVouchers, setLikedVouchers] = useState<Record<number, boolean>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +181,31 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
       return newState;
     });
   }, [vouchers]);
+
+  // ESC 키로 전체화면 이미지 닫기
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        if (fullscreenImage) {
+          setFullscreenImage(null);
+        } else if (modalVoucher) {
+          setModalVoucher(null);
+        }
+      }
+    }
+    
+    if (fullscreenImage || modalVoucher) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden'; // 스크롤 방지
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [fullscreenImage, modalVoucher]);
 
   // 마우스 휠 스크롤
   const handleWheel = (e: React.WheelEvent) => {
@@ -431,7 +457,16 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
             </button>
             
             <div className="mb-4">
-              <img src={modalVoucher.presignedImage} alt="기프티콘 이미지" className="w-full h-auto object-contain max-h-[60vh] rounded-lg" />
+              <img 
+                src={modalVoucher.presignedImage} 
+                alt="기프티콘 이미지" 
+                className="w-full h-auto object-contain max-h-[60vh] rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFullscreenImage(modalVoucher.presignedImage);
+                }}
+                title="클릭하면 크게 볼 수 있습니다"
+              />
             </div>
             
             <div className="space-y-3">
@@ -492,6 +527,32 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 전체화면 이미지 뷰어 */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4" 
+          onClick={() => setFullscreenImage(null)}
+        >
+          <div className="relative max-w-full max-h-full">
+            <button 
+              className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/50 rounded-full p-2 z-10"
+              onClick={() => setFullscreenImage(null)}
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+            <img 
+              src={fullscreenImage} 
+              alt="기프티콘 전체화면" 
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/80 text-sm bg-black/50 px-3 py-1 rounded-full">
+              클릭하거나 ESC를 눌러 닫기
             </div>
           </div>
         </div>
