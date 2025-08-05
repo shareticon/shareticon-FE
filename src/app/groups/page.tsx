@@ -91,12 +91,11 @@ function GroupsPageContent() {
       }
 
       // 응답 body가 있는지 확인 후 JSON 파싱
-      let joinResult = null;
       const responseText = await response.text();
       
       if (responseText.trim()) {
         try {
-          joinResult = JSON.parse(responseText);
+          JSON.parse(responseText);
         } catch {
           // JSON 파싱 실패 시 무시
         }

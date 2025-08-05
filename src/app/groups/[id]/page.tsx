@@ -170,7 +170,7 @@ function GroupDetailPageContent() {
 
   useEffect(() => {
     fetchVouchers();
-  }, [params.id]);
+  }, [params.id]); // fetchVouchers는 stable하므로 의존성에서 제외
 
   // 현재 사용자 정보 가져오기
   useEffect(() => {

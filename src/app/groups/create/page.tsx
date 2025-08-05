@@ -45,7 +45,7 @@ function CreateGroupPageContent() {
         throw new Error(`그룹 생성에 실패했습니다. (상태 코드: ${response.status})`);
       }
 
-      const createdGroup = await response.json();
+      await response.json();
       
       // 성공 시 그룹 목록 페이지로 이동
       router.push('/groups');

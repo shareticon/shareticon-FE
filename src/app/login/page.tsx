@@ -5,7 +5,6 @@ import GiftBarcodeIcon from '@/components/GiftBarcodeIcon';
 export default function LoginPage() {
   const handleKakaoLogin = () => {
     // 환경변수 확인 및 디버깅
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     const env = process.env.NEXT_PUBLIC_ENV;
     
 
