@@ -3,6 +3,7 @@ import { PhotoIcon, XMarkIcon, ChevronUpIcon, ChevronDownIcon, FunnelIcon, Trash
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import { logger } from '@/utils/logger';
 
 interface Voucher {
   id: number;
@@ -104,7 +105,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
       }
 
     } catch (error) {
-      console.error('찜 상태 토글 실패:', error);
+      logger.error('찜 상태 토글 실패:', error);
     }
   };
 

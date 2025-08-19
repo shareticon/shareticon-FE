@@ -2,6 +2,7 @@
 
 import { XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { logger } from '@/utils/logger';
 
 interface JoinGroupModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, succe
       setInviteCode(''); // 성공 시에만 초기화
     } catch (error) {
       // 에러는 부모 컴포넌트에서 처리
-      console.error('그룹 참여 실패:', error);
+      logger.error('그룹 참여 실패:', error);
     }
   };
 

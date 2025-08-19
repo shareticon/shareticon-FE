@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { logger } from '@/utils/logger';
+import ModalToast, { ModalToastProps } from './ModalToast';
 
 interface AddVoucherModalProps {
   isOpen: boolean;
@@ -21,6 +23,30 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
   const [day, setDay] = useState(new Date().getDate());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [toasts, setToasts] = useState<ModalToastProps[]>([]);
+
+  // 모달 내부 토스트 관리
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const showModalToast = useCallback((toast: Omit<ModalToastProps, 'id' | 'onClose'>) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    const newToast: ModalToastProps = {
+      ...toast,
+      id,
+      onClose: removeToast,
+    };
+    setToasts((prev) => [...prev, newToast]);
+  }, [removeToast]);
+
+  const showError = useCallback((title: string, message?: string) => {
+    showModalToast({ type: 'error', title, message });
+  }, [showModalToast]);
+
+  const showSuccess = useCallback((title: string, message?: string) => {
+    showModalToast({ type: 'success', title, message });
+  }, [showModalToast]);
 
   // 연도 옵션 생성 (현재 연도부터 10년)
   const years = Array.from(
@@ -61,6 +87,16 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
     e.preventDefault();
     if (!selectedFile || !name) return;
 
+    // 만료일 유효성 검사
+    const selectedDate = new Date(year, month - 1, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 시간 부분을 0으로 설정하여 날짜만 비교
+    
+    if (selectedDate < today) {
+      showError('잘못된 만료일', '만료일은 오늘 날짜 이후여야 합니다.');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const formData = new FormData();
@@ -69,9 +105,21 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
       formData.append('expiryDate', formatDate(year, month, day));
       
       await onSubmit(formData);
-      handleClose();
+      
+      // 성공 메시지 표시 후 잠시 후 모달 닫기
+      showSuccess('기프티콘 등록 완료', '기프티콘이 성공적으로 등록되었습니다.');
+      setTimeout(() => {
+        handleClose();
+      }, 1500);
     } catch (error) {
-      console.error('기프티콘 추가 실패:', error);
+      logger.error('기프티콘 추가 실패:', error);
+      
+      // 오류 메시지를 모달 내부에 표시
+      if (error instanceof Error) {
+        showError('기프티콘 등록 실패', error.message);
+      } else {
+        showError('기프티콘 등록 실패', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -84,6 +132,7 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
     setMonth(new Date().getMonth() + 1);
     setDay(new Date().getDate());
     setImageError(false);
+    setToasts([]); // 토스트도 초기화
     onClose();
   };
 
@@ -117,6 +166,15 @@ export const AddVoucherModal: React.FC<AddVoucherModalProps> = ({
           <Dialog.Title className="text-xl font-semibold text-gray-900 mb-6">
             기프티콘 추가
           </Dialog.Title>
+
+          {/* 모달 내부 토스트 컨테이너 */}
+          {toasts.length > 0 && (
+            <div className="mb-4 space-y-2">
+              {toasts.map((toast) => (
+                <ModalToast key={toast.id} {...toast} />
+              ))}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

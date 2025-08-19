@@ -11,6 +11,7 @@ import EditGroupNameModal from '@/components/EditGroupNameModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { createApiUrl } from '@/utils/api';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { logger } from '@/utils/logger';
 
 function GroupsPageContent() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -65,7 +66,7 @@ function GroupsPageContent() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('그룹 참여 에러 응답:', errorData);
+        logger.error('그룹 참여 에러 응답:', errorData);
         
         // 백엔드에서 온 에러 메시지 파싱 시도
         let errorMessage = '그룹 참여에 실패했습니다.';
@@ -114,7 +115,7 @@ function GroupsPageContent() {
       }, 2000);
       
     } catch (error) {
-      console.error('그룹 참여 실패:', error);
+      logger.error('그룹 참여 실패:', error);
       setJoinError(error instanceof Error ? error.message : '그룹 참여 중 오류가 발생했습니다.');
     } finally {
       setIsJoining(false);
@@ -153,7 +154,7 @@ function GroupsPageContent() {
       setIsEditModalOpen(false);
       setSelectedGroup(null);
     } catch (error) {
-      console.error('그룹명 수정 실패:', error);
+      logger.error('그룹명 수정 실패:', error);
       throw error;
     }
   };

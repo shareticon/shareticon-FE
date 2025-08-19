@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import HorizontalVoucherCards from '@/components/HorizontalVoucherCards';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import { logger } from '@/utils/logger';
 
 interface Voucher {
   id: number;
@@ -78,7 +79,7 @@ function HomeContent() {
       setFavoriteVouchers(convertedVouchers);
       
     } catch (e: unknown) {
-      console.error('찜한 기프티콘 조회 실패:', e);
+      logger.error('찜한 기프티콘 조회 실패:', e);
       // 에러가 발생해도 홈 화면은 정상적으로 표시하되, 찜한 기프티콘만 빈 배열로 설정
       setFavoriteVouchers([]);
     } finally {

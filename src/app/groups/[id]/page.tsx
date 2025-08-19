@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { VoucherList } from '@/components/VoucherList';
 import { AddVoucherModal } from '@/components/AddVoucherModal';
@@ -11,6 +11,8 @@ import ErrorDisplay from '@/components/ErrorDisplay';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 import ProtectedRoute from '@/components/ProtectedRoute';
+
+import { logger } from '@/utils/logger';
 
 interface Voucher {
   id: number;
@@ -48,9 +50,10 @@ function GroupDetailPageContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [inviteCode, setInviteCode] = useState<string>('');
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  
   const pageSize = 10;
 
-  const fetchVouchers = async (cursor: number | null = null) => {
+  const fetchVouchers = useCallback(async (cursor: number | null = null) => {
     try {
       const token = localStorage.getItem('accessToken');
 
@@ -72,7 +75,7 @@ function GroupDetailPageContent() {
       
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('API 에러 응답:', errorData);
+        logger.error('API 에러 응답:', errorData);
         
         throw new Error(
           `기프티콘 목록을 불러오는데 실패했습니다. (상태 코드: ${response.status})`
@@ -81,35 +84,47 @@ function GroupDetailPageContent() {
 
       const data: VoucherResponse = await response.json();
       
-      if (data.content.length > 0) {
+      if (data.content && data.content.length > 0) {
         const groupData = data.content[0];
-        const processedVouchers = groupData.vouchers.map(voucher => ({
+        const processedVouchers = groupData.vouchers ? groupData.vouchers.map(voucher => ({
           ...voucher,
           presignedImage: voucher.presignedImage
-        }));
+        })) : [];
 
         if (cursor === null) {
-          // 첫 로딩
+          // 첫 로딩 - 기존 데이터를 완전히 교체
           setVouchers(processedVouchers);
-          setGroupTitle(groupData.groupTitle);
-          setInviteCode(groupData.groupInviteCode);
+          setGroupTitle(groupData.groupTitle || '');
+          setInviteCode(groupData.groupInviteCode || '');
         } else {
-          // 추가 로딩
-          setVouchers(prev => [...prev, ...processedVouchers]);
+          // 추가 로딩 - 중복 방지를 위해 기존 voucher ID와 비교
+          setVouchers(prev => {
+            const existingIds = new Set(prev.map(v => v.id));
+            const newVouchers = processedVouchers.filter(v => !existingIds.has(v.id));
+            return [...prev, ...newVouchers];
+          });
         }
         
-        setHasMore(data.hasNext);
-        if (groupData.vouchers.length > 0) {
-          setCursorId(groupData.vouchers[groupData.vouchers.length - 1].id);
+        setHasMore(data.hasNext || false);
+        if (processedVouchers.length > 0) {
+          setCursorId(processedVouchers[processedVouchers.length - 1].id);
         }
+      } else {
+        // 데이터가 없는 경우
+        if (cursor === null) {
+          setVouchers([]);
+          setGroupTitle('');
+          setInviteCode('');
+        }
+        setHasMore(false);
       }
     } catch (error) {
-      console.error('기프티콘 목록 조회 실패:', error);
+      logger.error('기프티콘 목록 조회 실패:', error);
       setError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]);
 
   const loadMore = () => {
     if (!isLoading && hasMore && cursorId) {
@@ -149,28 +164,60 @@ function GroupDetailPageContent() {
         body: newFormData,
       });
 
-
-
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('기프티콘 추가 에러 응답:', errorData);
+        logger.error('기프티콘 추가 에러 응답:', errorData);
         
-        throw new Error(
-          `기프티콘 추가에 실패했습니다. (상태 코드: ${response.status})`
-        );
+        // 백엔드 오류 메시지 파싱 시도
+        let userMessage = '기프티콘 추가에 실패했습니다.';
+        try {
+          const errorJson = JSON.parse(errorData);
+          if (errorJson.message) {
+            userMessage = errorJson.message;
+          } else if (errorJson.error) {
+            userMessage = errorJson.error;
+          }
+        } catch {
+          // JSON 파싱 실패 시 기본 메시지 사용
+          if (response.status === 400) {
+            userMessage = '입력한 정보를 확인해주세요. 만료일이 현재 날짜보다 이전인 경우 등록할 수 없습니다.';
+          } else if (response.status === 401) {
+            userMessage = '로그인이 필요합니다.';
+          } else if (response.status === 403) {
+            userMessage = '권한이 없습니다.';
+          } else if (response.status >= 500) {
+            userMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+          }
+        }
+        
+        // 백엔드 오류를 그대로 전달하여 모달에서 처리하도록 함
+        throw new Error(userMessage);
       }
 
-      // 성공 시 목록 새로고침
+      // 성공 시 첫 페이지만 다시 로드하여 새로운 기프티콘을 포함시킴
+      // 기존 상태를 초기화하고 첫 페이지를 다시 가져옴
+      setVouchers([]);
+      setCursorId(null);
+      setHasMore(true);
       await fetchVouchers();
     } catch (error) {
-      console.error('기프티콘 추가 실패:', error);
+      logger.error('기프티콘 추가 실패:', error);
       throw error;
     }
   };
 
   useEffect(() => {
+    // 그룹이 변경될 때 상태 초기화
+    setVouchers([]);
+    setIsLoading(true);
+    setError(null);
+    setHasMore(true);
+    setCursorId(null);
+    setGroupTitle('');
+    setInviteCode('');
+    
     fetchVouchers();
-  }, [params.id]); // fetchVouchers는 stable하므로 의존성에서 제외
+  }, [params.id, fetchVouchers]);
 
   // 현재 사용자 정보 가져오기
   useEffect(() => {
@@ -190,7 +237,7 @@ function GroupDetailPageContent() {
           setCurrentUserId(userId);
         }
       } catch (error) {
-        console.error('사용자 정보 조회 실패:', error);
+        logger.error('사용자 정보 조회 실패:', error);
       }
     };
     

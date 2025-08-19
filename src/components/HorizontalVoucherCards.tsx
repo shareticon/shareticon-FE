@@ -3,6 +3,7 @@ import { PhotoIcon, XMarkIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import { logger } from '@/utils/logger';
 
 interface Voucher {
   id: number;
@@ -100,7 +101,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
       }
 
     } catch (error) {
-      console.error('찜 상태 토글 실패:', error);
+      logger.error('찜 상태 토글 실패:', error);
     }
   };
 

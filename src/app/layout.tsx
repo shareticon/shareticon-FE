@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import { NewGroupJoinRequestProvider } from '@/context/NewGroupJoinRequestContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <NewGroupJoinRequestProvider>
-          <main className="pb-16">
-            {children}
-          </main>
-          {!isLoginPage && <BottomNav />}
-        </NewGroupJoinRequestProvider>
+        <ToastProvider>
+          <NewGroupJoinRequestProvider>
+            <main className="pb-16">
+              {children}
+            </main>
+            {!isLoginPage && <BottomNav />}
+          </NewGroupJoinRequestProvider>
+        </ToastProvider>
       </body>
     </html>
   );

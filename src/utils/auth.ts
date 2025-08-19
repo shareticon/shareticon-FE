@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from './api';
+import { logger } from './logger';
 
 // 액세스 토큰을 저장할 변수
 let accessToken: string | null = null;
@@ -62,7 +63,7 @@ export const reissueToken = async (): Promise<string> => {
       }
       
       const errorText = await response.text();
-      console.error('토큰 재발급 실패:', response.status, errorText);
+      logger.error('토큰 재발급 실패:', response.status, errorText);
       
       // 다른 에러도 안전하게 로그인 페이지로 이동
       removeAccessToken();
@@ -73,7 +74,7 @@ export const reissueToken = async (): Promise<string> => {
     const newToken = response.headers.get('Authorization');
     
     if (!newToken) {
-      console.error('응답 헤더에 토큰이 없습니다');
+      logger.error('응답 헤더에 토큰이 없습니다');
       removeAccessToken();
       window.location.href = '/login';
       throw new Error('응답 헤더에 토큰이 없습니다');
@@ -82,7 +83,7 @@ export const reissueToken = async (): Promise<string> => {
     setAccessToken(newToken);
     return newToken;
   } catch (error) {
-    console.error('토큰 재발급 에러:', error);
+    logger.error('토큰 재발급 에러:', error);
     throw error;
   }
 };
@@ -117,7 +118,7 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}): Pr
 
     return response;
   } catch (error) {
-    console.error('API 요청 에러:', error);
+    logger.error('API 요청 에러:', error);
     throw error;
   }
 }; 

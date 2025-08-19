@@ -8,6 +8,7 @@ import { createApiUrl } from '@/utils/api';
 import EditUserNicknameModal from '@/components/EditUserNicknameModal';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { logger } from '@/utils/logger';
 
 interface UserProfile {
   userId: number;
@@ -39,7 +40,7 @@ function ProfilePageContent() {
       const data = await response.json();
       setUser(data);
     } catch (e) {
-      console.error('프로필 정보 조회 실패:', e);
+      logger.error('프로필 정보 조회 실패:', e);
       setError(e instanceof Error ? e.message : '프로필 정보를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
@@ -75,7 +76,7 @@ function ProfilePageContent() {
       router.push('/login');
       
     } catch (error: unknown) {
-      console.error('로그아웃 에러:', error);
+      logger.error('로그아웃 에러:', error);
       // 에러가 발생해도 토큰 정리는 수행
       removeAccessToken();
       router.push('/login');
@@ -93,7 +94,7 @@ function ProfilePageContent() {
       if (!response.ok) throw new Error('닉네임 변경 실패');
       setUser((prev: UserProfile | null) => prev ? { ...prev, nickName: newNickname } : null);
     } catch {
-      console.error('닉네임 수정 실패');
+      logger.error('닉네임 수정 실패');
       throw new Error('닉네임 수정 실패');
     }
   };

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import { logger } from '@/utils/logger';
 
 function CreateGroupPageContent() {
   const router = useRouter();
@@ -41,7 +42,7 @@ function CreateGroupPageContent() {
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('그룹 생성 에러 응답:', errorData);
+        logger.error('그룹 생성 에러 응답:', errorData);
         throw new Error(`그룹 생성에 실패했습니다. (상태 코드: ${response.status})`);
       }
 
@@ -50,7 +51,7 @@ function CreateGroupPageContent() {
       // 성공 시 그룹 목록 페이지로 이동
       router.push('/groups');
     } catch (error) {
-      console.error('그룹 생성 실패:', error);
+      logger.error('그룹 생성 실패:', error);
       setError(error instanceof Error ? error.message : '그룹 생성 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
