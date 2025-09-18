@@ -86,7 +86,7 @@ export default function JoinGroupModal({ isOpen, onClose, onSubmit, error, succe
             <button
               type="submit"
               disabled={inviteCode.length !== 10 || isLoading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               {isLoading ? (
                 <>

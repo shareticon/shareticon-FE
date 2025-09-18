@@ -27,3 +27,123 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 아이폰 스타일 날짜 선택기 */
+input[type="date"] {
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 웹킷 기반 브라우저 (Safari, Chrome) */
+input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+  color: #374151;
+  font-weight: 500;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  padding: 2px 2px;
+  border-radius: 4px;
+  background: transparent;
+  color: #374151;
+  font-weight: 500;
+  margin: 0 1px;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background: #3b82f6;
+  color: white;
+  outline: none;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #6b7280;
+  padding: 0 1px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  opacity: 0;
+}
+
+/* Firefox */
+input[type="date"]::-moz-focus-inner {
+  border: 0;
+}
+
+input[type="date"] {
+  -moz-appearance: none;
+}
+
+/* 포커스 시 아이폰 스타일 */
+input[type="date"]:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  ring-opacity: 0.5;
+}
+
+/* 달력 팝업 스타일링 (WebKit) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  opacity: 0;
+}
+
+/* 달력 드롭다운 스타일 개선 */
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+}
+
+/* 달력 팝업 전체 스타일 */
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+  display: none;
+}
+
+/* 달력 팝업이 열렸을 때 스타일 (제한적) */
+input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  background: transparent;
+}
+
+/* Safari/WebKit 달력 팝업 개선 */
+@supports (-webkit-appearance: none) {
+  input[type="date"] {
+    background: #f9fafb;
+    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  
+  input[type="date"]:focus {
+    background: #f3f4f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}

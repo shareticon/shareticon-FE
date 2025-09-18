@@ -129,7 +129,7 @@ function ProfilePageContent() {
         <header className="sticky top-0 bg-gray-50 z-10 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-indigo-900">내 프로필</h1>
+              <h1 className="text-2xl font-bold text-blue-900">내 프로필</h1>
               <p className="text-sm text-gray-600 mt-1">
                 프로필 정보를 확인하고 관리하세요
               </p>
@@ -152,10 +152,10 @@ function ProfilePageContent() {
               <div className="text-center mb-6">
                 <div className="relative inline-block">
                   <div className="flex items-center justify-center gap-2">
-                    <h2 className="text-xl font-semibold text-indigo-900 ml-10">{user ? user.nickName : '-'}</h2>
+                    <h2 className="text-xl font-semibold text-blue-900 ml-10">{user ? user.nickName : '-'}</h2>
                     <button
                       onClick={() => setIsEditModalOpen(true)}
-                      className="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      className="p-1 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                       title="닉네임 수정"
                     >
                       <PencilSquareIcon className="w-5 h-5" />
@@ -165,15 +165,15 @@ function ProfilePageContent() {
                 <p className="text-gray-600 mt-1">{user ? user.email : '-'}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 mb-2">
-                <div className="bg-indigo-50 p-4 rounded-lg text-center">
+                <div className="bg-blue-50 p-4 rounded-lg text-center">
                   <p className="text-sm text-gray-600">가입한 그룹</p>
-                  <p className="text-2xl font-semibold text-indigo-900 mt-1">{user ? user.joinGroupCount : '-'}</p>
+                  <p className="text-2xl font-semibold text-blue-900 mt-1">{user ? user.joinGroupCount : '-'}</p>
                 </div>
-                <div className="bg-indigo-50 p-4 rounded-lg text-center">
+                <div className="bg-blue-50 p-4 rounded-lg text-center">
                   <p className="text-sm text-gray-600">
                     내가 등록한<br className="sm:hidden" /> 기프티콘
                   </p>
-                  <p className="text-2xl font-semibold text-indigo-900 mt-1">{user ? user.ownedVoucherCount : '-'}</p>
+                  <p className="text-2xl font-semibold text-blue-900 mt-1">{user ? user.ownedVoucherCount : '-'}</p>
                 </div>
               </div>
             </div>

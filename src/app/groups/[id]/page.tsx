@@ -11,6 +11,7 @@ import ErrorDisplay from '@/components/ErrorDisplay';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { VoucherFilterCondition, createDefaultFilterCondition } from '@/types/voucher';
 
 import { logger } from '@/utils/logger';
 
@@ -50,17 +51,37 @@ function GroupDetailPageContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [inviteCode, setInviteCode] = useState<string>('');
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [filterCondition, setFilterCondition] = useState<VoucherFilterCondition>(createDefaultFilterCondition());
   
   const pageSize = 10;
 
-  const fetchVouchers = useCallback(async (cursor: number | null = null) => {
+  const fetchVouchers = useCallback(async (cursor: number | null = null, condition: VoucherFilterCondition = filterCondition) => {
     try {
       const token = localStorage.getItem('accessToken');
 
       const queryParams = new URLSearchParams({
-        pageSize: pageSize.toString(),
-        ...(cursor && { cursorId: cursor.toString() })
+        pageSize: pageSize.toString()
       });
+
+      // 커서 추가
+      if (cursor) {
+        queryParams.append('cursorId', cursor.toString());
+      }
+
+      // 상태 필터 추가 (복수)
+      if (condition.voucherStatuses && condition.voucherStatuses.length > 0) {
+        condition.voucherStatuses.forEach(status => {
+          queryParams.append('voucherStatuses', status);
+        });
+      }
+
+      // 날짜 필터 추가
+      if (condition.startDay) {
+        queryParams.append('startDay', condition.startDay);
+      }
+      if (condition.endDay) {
+        queryParams.append('endDay', condition.endDay);
+      }
 
       const apiUrl = createApiUrl(`/vouchers/${params.id}?${queryParams}`);
 
@@ -84,12 +105,22 @@ function GroupDetailPageContent() {
 
       const data: VoucherResponse = await response.json();
       
+      // 서버 응답 데이터 로그 추가
+      console.log('=== 서버 응답 데이터 ===');
+      console.log('Full response:', data);
+      
       if (data.content && data.content.length > 0) {
         const groupData = data.content[0];
-        const processedVouchers = groupData.vouchers ? groupData.vouchers.map(voucher => ({
-          ...voucher,
-          presignedImage: voucher.presignedImage
-        })) : [];
+        console.log('Group data:', groupData);
+        console.log('Vouchers:', groupData.vouchers);
+        
+        const processedVouchers = groupData.vouchers ? groupData.vouchers.map(voucher => {
+          console.log(`Voucher ${voucher.id} isWishList:`, voucher.isWishList);
+          return {
+            ...voucher,
+            presignedImage: voucher.presignedImage
+          };
+        }) : [];
 
         if (cursor === null) {
           // 첫 로딩 - 기존 데이터를 완전히 교체
@@ -124,13 +155,23 @@ function GroupDetailPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [params.id]);
+  }, [params.id, filterCondition]);
 
   const loadMore = () => {
     if (!isLoading && hasMore && cursorId) {
-      fetchVouchers(cursorId);
+      fetchVouchers(cursorId, filterCondition);
     }
   };
+
+  // 필터 변경 핸들러
+  const handleFilterChange = useCallback((newCondition: VoucherFilterCondition) => {
+    setFilterCondition(newCondition);
+    // 필터 변경 시 첫 페이지부터 다시 로드
+    setVouchers([]);
+    setCursorId(null);
+    setHasMore(true);
+    fetchVouchers(null, newCondition);
+  }, [fetchVouchers]);
 
   const handleAddVoucher = async (formData: FormData) => {
     try {
@@ -285,7 +326,7 @@ function GroupDetailPageContent() {
             <div className="flex items-center gap-2 ml-4 shrink-0">
               <button 
                 onClick={() => setIsInviteModalOpen(true)}
-                className="inline-flex items-center text-indigo-600 p-2 rounded-lg hover:bg-indigo-50 md:px-3 md:py-2 transition-colors"
+                className="inline-flex items-center text-blue-500 p-2 rounded-lg hover:bg-blue-50 md:px-3 md:py-2 transition-colors"
                 title="멤버 초대"
               >
                 <UserPlusIcon className="w-6 h-6" />
@@ -293,7 +334,7 @@ function GroupDetailPageContent() {
               </button>
               <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="inline-flex items-center bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 md:px-3 md:py-2 transition-colors"
+                className="inline-flex items-center bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 md:px-3 md:py-2 transition-colors"
                 title="기프티콘 추가"
               >
                 <PlusIcon className="w-5 h-5" />
@@ -309,8 +350,10 @@ function GroupDetailPageContent() {
           hasMore={hasMore}
           isLoading={isLoading}
           groupId={Number(params.id)}
-          onReload={fetchVouchers}
+          onReload={() => fetchVouchers(null, filterCondition)}
           currentUserId={currentUserId || undefined}
+          filterCondition={filterCondition}
+          onFilterChange={handleFilterChange}
         />
 
         <AddVoucherModal

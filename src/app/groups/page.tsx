@@ -200,7 +200,7 @@ function GroupsPageContent() {
                     setJoinError(null);
                     setJoinSuccessMessage(null);
                   }}
-                  className="inline-flex items-center text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                  className="inline-flex items-center text-blue-500 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
                   title="그룹 참여하기"
                 >
                   <UserPlusIcon className="w-5 h-5" />
@@ -208,7 +208,7 @@ function GroupsPageContent() {
                 </button>
                 <Link
                   href="/groups/create"
-                  className="inline-flex items-center bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                   title="새 그룹 만들기"
                 >
                   <PlusIcon className="w-5 h-5" />

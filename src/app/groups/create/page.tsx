@@ -110,7 +110,7 @@ function CreateGroupPageContent() {
           <button
             type="submit"
             disabled={!formData.name.trim() || isSubmitting}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
             {isSubmitting ? (
               <>

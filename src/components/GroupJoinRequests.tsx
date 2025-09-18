@@ -169,7 +169,7 @@ const GroupJoinRequests: React.FC = () => {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleAccept(group.targetGroupId, request.applyUserId)}
-                              className="px-3 py-1 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              className="px-3 py-1 rounded-md bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >수락</button>
                             <button
                               onClick={() => handleReject(group.targetGroupId, request.applyUserId)}

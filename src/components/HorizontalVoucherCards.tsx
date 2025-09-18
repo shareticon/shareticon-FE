@@ -105,6 +105,17 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
     }
   };
 
+  // 서버에서 받은 isWishList 값으로 찜 상태 초기화
+  useEffect(() => {
+    const newState: Record<number, boolean> = {};
+    vouchers.forEach(voucher => {
+      if (voucher.isWishList !== undefined) {
+        newState[voucher.id] = voucher.isWishList;
+      }
+    });
+    setLikedVouchers(newState);
+  }, [vouchers]);
+
   // 쿠폰 사용완료로 변경 (API 연동)
   const handleUseVoucher = async (voucherId: number) => {
     const voucher = vouchers.find(v => v.id === voucherId);
@@ -380,7 +391,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                   {voucher.status === 'AVAILABLE' && (
                     <button
                       onClick={e => { e.stopPropagation(); handleUseVoucher(voucher.id); }}
-                      className="absolute bottom-1 right-1 bg-indigo-600 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-indigo-700 transition-colors z-20"
+                      className="absolute bottom-1 right-1 bg-blue-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-blue-600 transition-colors z-20"
                     >
                       사용완료
                     </button>
@@ -511,7 +522,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                 <div className="pt-4 border-t border-gray-100">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleUseVoucher(modalVoucher.id); setModalVoucher(null); }}
-                    className="w-full bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-indigo-700 transition-colors"
+                    className="w-full bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
                   >
                     사용완료로 변경
                   </button>

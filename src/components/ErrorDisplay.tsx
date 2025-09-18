@@ -111,7 +111,7 @@ export default function ErrorDisplay({
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                className="w-full bg-blue-500 text-white py-3 px-4 rounded-xl font-medium hover:bg-blue-600 transition-colors shadow-sm"
               >
                 {retryText}
               </button>

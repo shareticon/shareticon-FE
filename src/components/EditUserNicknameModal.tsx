@@ -69,7 +69,7 @@ export default function EditUserNicknameModal({
           <button
             type="submit"
             disabled={isSubmitting || !newNickname.trim() || newNickname === currentNickname}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? '수정 중...' : '수정하기'}
           </button>

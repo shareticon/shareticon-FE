@@ -4,6 +4,8 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { fetchWithToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 import { logger } from '@/utils/logger';
+import { VoucherFilterCondition, VoucherStatus, SortOrder } from '@/types/voucher';
+import { useToast } from '@/contexts/ToastContext';
 
 interface Voucher {
   id: number;
@@ -24,10 +26,10 @@ interface VoucherListProps {
   groupId: number;
   onReload?: () => void;
   currentUserId?: number;
+  filterCondition: VoucherFilterCondition;
+  onFilterChange: (condition: VoucherFilterCondition) => void;
 }
 
-type SortOrder = 'asc' | 'desc';
-type StatusFilter = 'AVAILABLE' | 'USED' | 'EXPIRED';
 
 const isValidImageUrl = (url: string | undefined | null): boolean => {
   if (!url) return false;
@@ -40,12 +42,12 @@ const isValidImageUrl = (url: string | undefined | null): boolean => {
   }
 };
 
-const STATUS_LABEL: Record<StatusFilter, string> = {
+const STATUS_LABEL: Record<VoucherStatus, string> = {
   AVAILABLE: '사용가능',
   USED: '사용완료',
   EXPIRED: '만료됨',
 };
-const STATUS_BADGE: Record<StatusFilter, string> = {
+const STATUS_BADGE: Record<VoucherStatus, string> = {
   AVAILABLE: 'bg-green-100 text-green-800',
   USED: 'bg-gray-100 text-gray-800',
   EXPIRED: 'bg-red-100 text-red-800',
@@ -59,16 +61,33 @@ export const VoucherList: React.FC<VoucherListProps> = ({
   groupId,
   onReload,
   currentUserId,
+  filterCondition,
+  onFilterChange,
 }) => {
+  const { showInfo } = useToast();
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [modalVoucher, setModalVoucher] = useState<Voucher | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [likedVouchers, setLikedVouchers] = useState<Record<number, boolean>>({});
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [selectedStatuses, setSelectedStatuses] = useState<Set<StatusFilter>>(new Set(['AVAILABLE', 'USED']));
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<HTMLDivElement>(null);
+  
+  // 필터 조건에서 현재 선택된 상태들을 가져옴
+  const selectedStatuses = new Set(filterCondition.voucherStatuses || ['AVAILABLE', 'USED']);
+  
+  // 날짜 필터 로컬 상태 (UI에서만 사용)
+  const [localDateFrom, setLocalDateFrom] = useState<string>(filterCondition.startDay || '');
+  const [localDateTo, setLocalDateTo] = useState<string>(filterCondition.endDay || '');
+  const [localStatuses, setLocalStatuses] = useState<Set<VoucherStatus>>(new Set(filterCondition.voucherStatuses || ['AVAILABLE', 'USED']));
+
+  // filterCondition이 변경될 때 로컬 상태 동기화
+  useEffect(() => {
+    setLocalDateFrom(filterCondition.startDay || '');
+    setLocalDateTo(filterCondition.endDay || '');
+    setLocalStatuses(new Set(filterCondition.voucherStatuses || ['AVAILABLE', 'USED']));
+  }, [filterCondition]);
 
   // 찜 상태 토글 함수
   const toggleLike = async (voucherId: number, e: React.MouseEvent) => {
@@ -109,21 +128,30 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     }
   };
 
-  // 서버에서 받은 isWishList 값으로 찜 상태 초기화 (기존 로컬 변경사항 보존)
+  // 서버에서 받은 isWishList 값으로 찜 상태 초기화
   useEffect(() => {
-    setLikedVouchers(prev => {
-      const newState = { ...prev };
-      vouchers.forEach(voucher => {
-        // 로컬에서 변경된 적이 없는 경우에만 서버 값으로 설정
-        if (!(voucher.id in prev)) {
-          if (voucher.isWishList !== undefined) {
-            newState[voucher.id] = voucher.isWishList;
-          }
-        }
-      });
-      return newState;
+    console.log('=== VoucherList 찜 상태 초기화 ===');
+    console.log('받은 vouchers:', vouchers);
+    
+    const newState: Record<number, boolean> = {};
+    vouchers.forEach(voucher => {
+      console.log(`Voucher ${voucher.id}: isWishList = ${voucher.isWishList} (type: ${typeof voucher.isWishList})`);
+      
+      if (voucher.isWishList !== undefined) {
+        newState[voucher.id] = voucher.isWishList;
+      }
     });
+    
+    console.log('설정할 찜 상태:', newState);
+    setLikedVouchers(newState);
   }, [vouchers]);
+
+  // filterCondition 변경 시 로컬 상태 업데이트
+  useEffect(() => {
+    setLocalDateFrom(filterCondition.startDay || '');
+    setLocalDateTo(filterCondition.endDay || '');
+    setLocalStatuses(new Set(filterCondition.voucherStatuses || ['AVAILABLE', 'USED']));
+  }, [filterCondition]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -188,28 +216,76 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     setImageErrors(prev => ({ ...prev, [voucherId]: true }));
   };
 
-  const handleStatusChange = (status: StatusFilter) => {
-    setSelectedStatuses(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(status)) {
-        newSet.delete(status);
-      } else {
-        newSet.add(status);
-      }
-      return newSet;
-    });
+  // 로컬 상태 변경 핸들러들 (필터 창에서만 사용)
+  const handleLocalStatusChange = (status: VoucherStatus) => {
+    const newStatuses = new Set(localStatuses);
+    if (newStatuses.has(status)) {
+      newStatuses.delete(status);
+    } else {
+      newStatuses.add(status);
+    }
+    setLocalStatuses(newStatuses);
   };
 
-  const filteredAndSortedVouchers = vouchers
-    .filter(voucher => {
-      const status = (voucher.status || '').toUpperCase().trim() as StatusFilter;
-      return Array.from(selectedStatuses).some(sel => sel === status);
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.expiration).getTime();
-      const dateB = new Date(b.expiration).getTime();
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-    });
+  // 필터 적용
+  const handleFilterApply = () => {
+    // 아무것도 선택하지 않았을 때 백엔드 기본값 적용
+    let finalStatuses = Array.from(localStatuses);
+    let finalStartDay = localDateFrom;
+    let finalEndDay = localDateTo;
+    
+    // 상태를 아무것도 선택하지 않았는지 확인
+    const noStatusSelected = localStatuses.size === 0;
+    
+    // 상태가 하나도 선택되지 않았으면 기본값 적용
+    if (localStatuses.size === 0) {
+      finalStatuses = ['AVAILABLE', 'USED'];
+      setLocalStatuses(new Set(finalStatuses));
+    }
+    
+    // 날짜가 둘 다 비어있으면 백엔드 기본값(오늘부터 30일) 적용
+    if (!finalStartDay && !finalEndDay) {
+      const today = new Date();
+      const thirtyDaysLater = new Date(today);
+      thirtyDaysLater.setDate(today.getDate() + 30);
+      
+      finalStartDay = today.toISOString().split('T')[0];
+      finalEndDay = thirtyDaysLater.toISOString().split('T')[0];
+      
+      // UI 상태도 업데이트
+      setLocalDateFrom(finalStartDay);
+      setLocalDateTo(finalEndDay);
+    }
+    
+    // 상태를 선택하지 않았을 때 토스트 메시지 표시
+    if (noStatusSelected) {
+      showInfo('아무것도 선택하지 않으면 기본 조건이 적용됩니다', undefined, 3000);
+    }
+    
+    const newCondition: VoucherFilterCondition = {
+      voucherStatuses: finalStatuses,
+      startDay: finalStartDay || undefined,
+      endDay: finalEndDay || undefined,
+    };
+    
+    onFilterChange(newCondition);
+    setFilterOpen(false);
+  };
+
+  // 필터 취소
+  const handleFilterCancel = () => {
+    setLocalDateFrom(filterCondition.startDay || '');
+    setLocalDateTo(filterCondition.endDay || '');
+    setLocalStatuses(new Set(filterCondition.voucherStatuses || ['AVAILABLE', 'USED']));
+    setFilterOpen(false);
+  };
+
+  // 백엔드에서 이미 필터링된 데이터가 오므로 정렬만 수행
+  const sortedVouchers = vouchers.sort((a, b) => {
+    const dateA = new Date(a.expiration).getTime();
+    const dateB = new Date(b.expiration).getTime();
+    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+  });
 
   // 쿠폰 사용완료로 변경 (API 연동)
   const handleUseVoucher = async (voucherId: number) => {
@@ -290,17 +366,6 @@ export const VoucherList: React.FC<VoucherListProps> = ({
     }
   };
 
-  if (!vouchers || vouchers.length === 0) {
-    return (
-      <div className="p-8 text-center text-gray-600">
-        <p>아직 등록된 기프티콘이 없습니다.</p>
-        <p className="text-sm mt-1">기프티콘을 추가해보세요!</p>
-      </div>
-    );
-  }
-
-
-
   return (
     <div className="p-4">
       <div className="sticky top-[88px] z-30 bg-white mb-3 w-full flex items-center min-h-[40px] border border-gray-200 shadow-sm rounded-lg">
@@ -316,31 +381,179 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             <ChevronDownIcon className={`w-4 h-4 ml-0.5 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
           </button>
           {filterOpen && (
-            <div className="absolute left-0 top-full w-44 bg-white border border-gray-200 rounded-b-xl rounded-tr-xl shadow-xl z-30 py-2 mt-0.5">
-              <div className="px-4 py-2 text-xs text-gray-400 font-semibold">상태 필터</div>
-              {(['AVAILABLE', 'USED', 'EXPIRED'] as StatusFilter[]).map(status => (
-                <label
-                  key={status}
-                  className="flex items-center gap-2 px-4 py-2 cursor-pointer text-gray-700 hover:bg-gray-50 rounded-md"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedStatuses.has(status)}
-                    onChange={() => handleStatusChange(status)}
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
-                </label>
-              ))}
+            <div className="absolute left-0 top-full w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-30 overflow-hidden mt-0.5">
+              {/* 상태 필터 섹션 */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="text-xs text-gray-500 font-medium mb-3">상태</div>
+                <div className="space-y-2">
+                  {(['AVAILABLE', 'USED', 'EXPIRED'] as VoucherStatus[]).map(status => (
+                    <label
+                      key={status}
+                      className="flex items-center gap-3 py-1 cursor-pointer group"
+                    >
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={localStatuses.has(status)}
+                          onChange={() => handleLocalStatusChange(status)}
+                          className="sr-only"
+                        />
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                          localStatuses.has(status) 
+                            ? 'bg-blue-500 border-blue-500' 
+                            : 'border-gray-300 group-hover:border-gray-400'
+                        }`}>
+                          {localStatuses.has(status) && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_BADGE[status]}`}>
+                        {STATUS_LABEL[status]}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* 날짜 필터 섹션 */}
+              <div className="px-4 py-3">
+                <div className="text-xs text-gray-500 font-medium mb-3">만료일 범위</div>
+                
+                {/* 시작일 */}
+                <div className="mb-3">
+                  <label className="block text-xs text-gray-600 mb-2">시작일</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={localDateFrom}
+                      onChange={(e) => setLocalDateFrom(e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 transition-all text-gray-700 font-medium"
+                      style={{
+                        colorScheme: 'light',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        appearance: 'none',
+                        backgroundImage: 'none',
+                        outline: 'none',
+                        boxShadow: 'none',
+                      }}
+                      max={localDateTo || undefined}
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 종료일 */}
+                <div className="mb-4">
+                  <label className="block text-xs text-gray-600 mb-2">종료일</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={localDateTo}
+                      onChange={(e) => setLocalDateTo(e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 transition-all text-gray-700 font-medium"
+                      style={{
+                        colorScheme: 'light',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        appearance: 'none',
+                        backgroundImage: 'none',
+                        outline: 'none',
+                        boxShadow: 'none',
+                      }}
+                      min={localDateFrom || undefined}
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 빠른 선택 버튼 */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      setLocalDateFrom(today.toISOString().split('T')[0]);
+                      setLocalDateTo('');
+                    }}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    오늘부터
+                  </button>
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      const weekLater = new Date(today);
+                      weekLater.setDate(today.getDate() + 7);
+                      setLocalDateFrom(today.toISOString().split('T')[0]);
+                      setLocalDateTo(weekLater.toISOString().split('T')[0]);
+                    }}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    일주일
+                  </button>
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      const monthLater = new Date(today);
+                      monthLater.setMonth(today.getMonth() + 1);
+                      setLocalDateFrom(today.toISOString().split('T')[0]);
+                      setLocalDateTo(monthLater.toISOString().split('T')[0]);
+                    }}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    한달
+                  </button>
+                </div>
+
+                {/* 액션 버튼 */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleFilterApply}
+                    className="flex-1 bg-blue-500 text-white text-sm font-medium py-2.5 rounded-xl hover:bg-blue-600 transition-colors"
+                  >
+                    적용
+                  </button>
+                  <button
+                    onClick={handleFilterCancel}
+                    className="px-4 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
-        <div className="flex gap-1 sm:gap-2 items-center bg-gray-50 h-10 px-2 sm:px-4 min-w-0 overflow-x-auto scrollbar-hide flex-1 rounded-r-lg rounded-l-none">
-          {Array.from(selectedStatuses).map(status => (
-            <span key={status} className={`text-xs px-1.5 sm:px-2 py-1 rounded-full font-medium flex-shrink-0 ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
-          ))}
+        <div className="flex gap-1 sm:gap-2 items-center bg-gray-50 min-h-[40px] px-2 sm:px-4 flex-1 rounded-r-lg rounded-l-none overflow-hidden">
+          <div className="flex gap-1 sm:gap-2 items-center flex-wrap py-2">
+            {Array.from(selectedStatuses).map(status => (
+              <span key={status} className={`text-xs px-1.5 sm:px-2 py-1 rounded-full font-medium ${STATUS_BADGE[status as VoucherStatus]}`}>{STATUS_LABEL[status as VoucherStatus]}</span>
+            ))}
+            
+          {/* 날짜 필터 표시 */}
+          {(filterCondition.startDay || filterCondition.endDay) && (
+            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+              {filterCondition.startDay && filterCondition.endDay
+                ? `${filterCondition.startDay} ~ ${filterCondition.endDay}`
+                : filterCondition.startDay
+                ? `${filterCondition.startDay} 이후`
+                : `${filterCondition.endDay} 이전`}
+            </span>
+          )}
+          </div>
           <div className="flex-1 min-w-2" />
-          <div className="flex items-center gap-1 sm:gap-2 bg-gray-50 h-10 px-2 sm:px-4 rounded-r-lg text-gray-600 flex-shrink-0">
+          <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
             <span className="text-xs hidden sm:inline">만료일</span>
             <button
               onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
@@ -358,9 +571,16 @@ export const VoucherList: React.FC<VoucherListProps> = ({
         </div>
       </div>
 
-      <div className="relative grid grid-cols-2 md:grid-cols-3 gap-4 z-0 pt-[56px] px-2">
-        {filteredAndSortedVouchers.map((voucher) => (
-          <div
+      {/* 기프티콘 그리드 또는 빈 상태 메시지 */}
+      {!vouchers || vouchers.length === 0 ? (
+        <div className="p-8 text-center text-gray-600">
+          <p>표시할 기프티콘이 없습니다.</p>
+          <p className="text-sm mt-1">필터 조건을 변경하거나 새 기프티콘을 추가해보세요.</p>
+        </div>
+      ) : (
+        <div className="relative grid grid-cols-2 md:grid-cols-3 gap-4 z-0 pt-[56px] px-2">
+          {sortedVouchers.map((voucher) => (
+            <div
             key={voucher.id}
             className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group"
             onClick={() => {
@@ -425,7 +645,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               {voucher.status === 'AVAILABLE' && (
                 <button
                   onClick={e => { e.stopPropagation(); handleUseVoucher(voucher.id); }}
-                  className="absolute bottom-1 right-1 bg-indigo-600 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-indigo-700 transition-colors z-20"
+                  className="absolute bottom-1 right-1 bg-blue-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-blue-600 transition-colors z-20"
                 >
                   사용완료
                 </button>
@@ -461,7 +681,19 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             </div>
           </div>
         ))}
-      </div>
+
+          {/* 무한 스크롤을 위한 관찰 요소 */}
+          <div ref={observerRef} className="h-4 mt-4">
+            {isLoading && (
+              <div className="text-center text-gray-500 text-sm">
+                로딩 중...
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 상세 정보 모달 */}
       {modalVoucher && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setModalVoucher(null)}>
           <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
@@ -541,15 +773,6 @@ export const VoucherList: React.FC<VoucherListProps> = ({
           </div>
         </div>
       )}
-      
-      {/* 무한 스크롤을 위한 관찰 요소 */}
-      <div ref={observerRef} className="h-4 mt-4">
-        {isLoading && (
-          <div className="text-center text-gray-500 text-sm">
-            로딩 중...
-          </div>
-        )}
-      </div>
     </div>
   );
 }; 

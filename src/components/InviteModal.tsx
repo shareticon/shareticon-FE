@@ -52,7 +52,7 @@ export default function InviteModal({ isOpen, onClose, groupName, inviteCode }: 
                 className={`p-2 rounded-lg transition-colors ${
                   copied 
                     ? 'text-green-600 bg-green-50 hover:bg-green-100' 
-                    : 'text-indigo-600 hover:bg-indigo-50'
+                    : 'text-blue-500 hover:bg-blue-50'
                 }`}
                 title="코드 복사"
               >
