@@ -243,14 +243,23 @@ export const VoucherList: React.FC<VoucherListProps> = ({
       setLocalStatuses(new Set(finalStatuses));
     }
     
-    // 날짜가 둘 다 비어있으면 백엔드 기본값(오늘부터 30일) 적용
+    // 날짜가 둘 다 비어있으면 백엔드 기본값(오늘부터 다음 달 마지막 날) 적용
     if (!finalStartDay && !finalEndDay) {
       const today = new Date();
-      const thirtyDaysLater = new Date(today);
-      thirtyDaysLater.setDate(today.getDate() + 30);
+      // 백엔드 로직과 동일: plusMonths(1).with(TemporalAdjusters.lastDayOfMonth())
+      // 다음 달의 마지막 날 (로컬 시간대 기준)
+      const nextMonthLastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0);
       
-      finalStartDay = today.toISOString().split('T')[0];
-      finalEndDay = thirtyDaysLater.toISOString().split('T')[0];
+      // 로컬 시간대 기준으로 날짜 문자열 생성
+      const formatLocalDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
+      finalStartDay = formatLocalDate(today);
+      finalEndDay = formatLocalDate(nextMonthLastDay);
       
       // UI 상태도 업데이트
       setLocalDateFrom(finalStartDay);
