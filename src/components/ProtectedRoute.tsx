@@ -42,6 +42,7 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
         }
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
+        const errorName = (error as { name?: string })?.name || '';
         console.error('인증 확인 실패:', message);
         
         // 네트워크 에러인지 확인 (더 포괄적으로)
@@ -54,8 +55,8 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
           errorString.includes('NetworkError') ||
           errorString.includes('ERR_NETWORK') ||
           errorString.includes('ERR_INTERNET_DISCONNECTED') ||
-          error.name === 'TypeError' ||
-          !navigator.onLine;
+          errorName === 'TypeError' ||
+          (typeof navigator !== 'undefined' && !navigator.onLine);
         
         if (isNetworkError) {
           setAuthError('network');
