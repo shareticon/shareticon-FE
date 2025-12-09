@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import GroupJoinRequestsSection from './profile/GroupJoinRequestsSection';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import { NetworkErrorPage } from '@/components/ErrorPages';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import HorizontalVoucherCards from '@/components/HorizontalVoucherCards';
 import { fetchWithToken } from '@/utils/auth';
@@ -80,8 +81,16 @@ function HomeContent() {
       
     } catch (e: unknown) {
       logger.error('찜한 기프티콘 조회 실패:', e);
-      // 에러가 발생해도 홈 화면은 정상적으로 표시하되, 찜한 기프티콘만 빈 배열로 설정
-      setFavoriteVouchers([]);
+      
+      // 네트워크 에러인지 확인
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('ERR_CONNECTION_REFUSED')) {
+        // 백엔드 서버 연결 실패 - 새로운 네트워크 에러 페이지 표시
+        setError('NETWORK_ERROR');
+      } else {
+        // 다른 에러는 무시하고 빈 배열로 설정
+        setFavoriteVouchers([]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -104,6 +113,23 @@ function HomeContent() {
   }
 
   if (error) {
+    // 네트워크 에러인 경우 새로운 에러 페이지 사용
+    if (error === 'NETWORK_ERROR') {
+      return (
+        <NetworkErrorPage 
+          title="오류가 발생했습니다"
+          message="네트워크 상태를 확인하시거나 잠시 후 다시 시도해 주세요"
+          onRetry={() => {
+            setError(null);
+            fetchFavoriteVouchers();
+          }}
+          onGoHome={() => window.location.reload()}
+          showHome={true}
+        />
+      );
+    }
+    
+    // 다른 에러는 기존 ErrorDisplay 사용
     return (
       <ErrorDisplay 
         error={error}

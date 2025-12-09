@@ -52,7 +52,15 @@ const GroupJoinRequests: React.FC = () => {
         setGroupRequests(processedData);
         
       } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : '오류가 발생했습니다.');
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        
+        // 네트워크 에러인 경우 조용히 실패 (홈 페이지에서는 이 컴포넌트 에러로 전체가 망가지지 않도록)
+        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('ERR_CONNECTION_REFUSED')) {
+          console.log('GroupJoinRequests: 서버 연결 실패, 조용히 무시');
+          setGroupRequests([]);
+        } else {
+          setError(errorMessage);
+        }
       } finally {
         setLoading(false);
       }

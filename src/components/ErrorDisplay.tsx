@@ -60,10 +60,10 @@ export default function ErrorDisplay({
       );
     }
     if (errorString.includes('404')) {
-      // 404 에러 아이콘
+      // 404 에러 아이콘 (페이지 찾을 수 없음)
       return (
         <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.5-1.01-6-2.709M15 13.5a4.5 4.5 0 11-6 0 4.5 4.5 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.5-1.01-6-2.709M15 13.5a4.5 4.5 0 11-6 0 4.5 4.5 0 016 0z" />
         </svg>
       );
     }

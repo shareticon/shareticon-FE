@@ -6,6 +6,10 @@ let accessToken: string | null = null;
 
 // 쿠키 삭제 함수
 const clearAllCookies = (): void => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+  
   // 현재 도메인의 모든 쿠키 삭제
   document.cookie.split(";").forEach(function(c) { 
     document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
@@ -24,12 +28,14 @@ const clearAllCookies = (): void => {
 // 액세스 토큰 설정
 export const setAccessToken = (token: string): void => {
   accessToken = token;
-  localStorage.setItem('accessToken', token);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('accessToken', token);
+  }
 };
 
 // 액세스 토큰 가져오기
 export const getAccessToken = (): string | null => {
-  if (!accessToken) {
+  if (!accessToken && typeof window !== 'undefined') {
     accessToken = localStorage.getItem('accessToken');
   }
   return accessToken;
@@ -38,9 +44,11 @@ export const getAccessToken = (): string | null => {
 // 액세스 토큰 제거 (쿠키도 함께 정리)
 export const removeAccessToken = (): void => {
   accessToken = null;
-  localStorage.removeItem('accessToken');
-  // 모든 쿠키도 정리
-  clearAllCookies();
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('accessToken');
+    // 모든 쿠키도 정리
+    clearAllCookies();
+  }
 };
 
 // 토큰 재발급 요청
@@ -54,20 +62,17 @@ export const reissueToken = async (): Promise<string> => {
     });
 
     if (!response.ok) {
-      // 401 또는 403 에러 시 모든 토큰 정리 후 로그인 페이지로 이동
+      // 401 또는 403 에러 시 모든 토큰 정리
       if (response.status === 401 || response.status === 403) {
-
         removeAccessToken();
-        window.location.href = '/login';
         throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
       }
       
       const errorText = await response.text();
       logger.error('토큰 재발급 실패:', response.status, errorText);
       
-      // 다른 에러도 안전하게 로그인 페이지로 이동
+      // 다른 에러도 안전하게 토큰 정리
       removeAccessToken();
-      window.location.href = '/login';
       throw new Error(`토큰 재발급 실패: ${response.status} - ${errorText}`);
     }
 
@@ -76,7 +81,6 @@ export const reissueToken = async (): Promise<string> => {
     if (!newToken) {
       logger.error('응답 헤더에 토큰이 없습니다');
       removeAccessToken();
-      window.location.href = '/login';
       throw new Error('응답 헤더에 토큰이 없습니다');
     }
 
@@ -108,11 +112,9 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}): Pr
       credentials: 'include', // 항상 쿠키 포함
     });
 
-    // 401 에러 처리 - 모든 토큰 정리 후 로그인 페이지로 이동
+    // 401 에러 처리 - 모든 토큰 정리
     if (response.status === 401) {
-
       removeAccessToken();
-      window.location.href = '/login';
       throw new Error('인증이 만료되었습니다.');
     }
 

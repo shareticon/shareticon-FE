@@ -1,11 +1,26 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Poppins, Noto_Sans_KR, IBM_Plex_Sans_KR } from "next/font/google";
 import "./globals.css";
-import BottomNav from "@/components/BottomNav";
+import ConditionalBottomNav from "@/components/ConditionalBottomNav";
 import { NewGroupJoinRequestProvider } from '@/context/NewGroupJoinRequestContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 
 const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins"
+});
+const notoSansKR = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-noto-sans-kr"
+});
+const ibmPlexSansKR = IBM_Plex_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex-sans-kr"
+});
 
 export const metadata: Metadata = {
   title: "Shareticon",
@@ -17,19 +32,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-  // next/navigation의 usePathname은 클라이언트 컴포넌트에서만 사용 가능하므로, 아래처럼 처리
-  const isLoginPage = pathname === '/login';
-
   return (
     <html lang="ko">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${poppins.variable} ${notoSansKR.variable} ${ibmPlexSansKR.variable}`}>
         <ToastProvider>
           <NewGroupJoinRequestProvider>
             <main className="pb-16">
               {children}
             </main>
-            {!isLoginPage && <BottomNav />}
+            <ConditionalBottomNav />
           </NewGroupJoinRequestProvider>
         </ToastProvider>
       </body>
