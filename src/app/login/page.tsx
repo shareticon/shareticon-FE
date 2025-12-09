@@ -237,7 +237,7 @@ export default function LoginPage() {
         {/* Character Illustration - 뒤쪽 레이어 */}
         <div className="w-[300px] h-[300px] flex items-center justify-center ml-[15px] relative z-10">
           <Image 
-            src="/images/cat-character.svg" 
+            src="/images/Default_PNG_1_2_0_f8f3edf7-a683-4df9-bc93-561baa692271_0.png" 
             alt="Shareticon Cat Character" 
             width={300}
             height={300}
