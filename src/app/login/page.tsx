@@ -1,5 +1,6 @@
 'use client';
 import type { CSSProperties } from 'react';
+import Image from 'next/image';
 
 // 떠다니는 애니메이션 스타일
 const floatAnimation = `
@@ -235,10 +236,13 @@ export default function LoginPage() {
       <div className="w-full flex flex-col items-center mt-[60px] animate-fade-slide-2 relative z-10">
         {/* Character Illustration - 뒤쪽 레이어 */}
         <div className="w-[300px] h-[300px] flex items-center justify-center ml-[15px] relative z-10">
-          <img 
-            src="/images/Default_PNG_1_2_0_f8f3edf7-a683-4df9-bc93-561baa692271_0.png" 
+          <Image 
+            src="/images/cat-character.svg" 
             alt="Shareticon Cat Character" 
+            width={300}
+            height={300}
             className="w-full h-full object-contain drop-shadow-lg"
+            priority
           />
         </div>
         {/* Kakao Login Button - 앞쪽 레이어 */}
