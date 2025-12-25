@@ -120,7 +120,11 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}): Pr
 
     return response;
   } catch (error) {
-    logger.error('API 요청 에러:', error);
+    // 401 에러는 정상적인 인증 흐름이므로 조용히 처리
+    const is401 = error instanceof Error && error.message.includes('인증이 만료');
+    if (!is401) {
+      logger.error('API 요청 에러:', error);
+    }
     throw error;
   }
 }; 

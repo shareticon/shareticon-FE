@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
-import { fetchWithToken } from '@/utils/auth';
+import { fetchWithToken, getAccessToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
+import { logger } from '@/utils/logger';
 
 interface JoinRequest {
   applyUserId: number;
@@ -22,6 +23,13 @@ const GroupJoinRequests: React.FC = () => {
 
   useEffect(() => {
     const fetchRequests = async () => {
+      // 토큰이 없으면 API 호출하지 않음 (ProtectedRoute가 인증을 보장)
+      const token = getAccessToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -56,7 +64,7 @@ const GroupJoinRequests: React.FC = () => {
         
         // 네트워크 에러인 경우 조용히 실패 (홈 페이지에서는 이 컴포넌트 에러로 전체가 망가지지 않도록)
         if (errorMessage.includes('Failed to fetch') || errorMessage.includes('ERR_CONNECTION_REFUSED')) {
-          console.log('GroupJoinRequests: 서버 연결 실패, 조용히 무시');
+          logger.log('GroupJoinRequests: 서버 연결 실패, 조용히 무시');
           setGroupRequests([]);
         } else {
           setError(errorMessage);
