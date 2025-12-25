@@ -40,7 +40,7 @@ export default function EditGroupNameModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl w-full max-w-md shadow-xl">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-900">그룹명 수정</h2>
           <button

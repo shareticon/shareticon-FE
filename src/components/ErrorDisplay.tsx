@@ -76,9 +76,9 @@ export default function ErrorDisplay({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 text-center border border-stone-200/60">
           {/* 에러 아이콘 */}
           <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
             {getErrorIcon(error)}

@@ -109,10 +109,10 @@ export default function ProtectedRoute({ children, fallback, redirectToLogin = f
   // 인증 확인 중
   if (isCheckingAuth || isAuthenticated === null) {
     return fallback || (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">인증 확인 중...</p>
+          <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-stone-600">인증 확인 중...</p>
         </div>
       </div>
     );

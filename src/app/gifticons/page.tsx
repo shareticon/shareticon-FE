@@ -27,7 +27,7 @@ const mockGifticons = [
 export default function GifticonsPage() {
   return (
     <div className="container mx-auto max-w-2xl">
-      <header className="sticky top-0 bg-white z-10 p-4 border-b">
+      <header className="sticky top-0 backdrop-blur-sm bg-[#fffef9]/80 z-10 p-4 border-b border-amber-200/50">
         <h1 className="text-2xl font-bold">나의 기프티콘</h1>
       </header>
       <GifticonGrid gifticons={mockGifticons} />

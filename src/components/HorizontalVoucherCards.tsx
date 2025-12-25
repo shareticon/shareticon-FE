@@ -307,11 +307,11 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
   // 빈 상태 렌더링
   if (vouchers.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+      <div className="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-amber-200/50">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold text-indigo-900">{title}</h2>
+          <h2 className="text-xl font-semibold text-amber-900">{title}</h2>
         </div>
-        <div className="bg-gray-100 rounded-lg p-4 text-center text-gray-600 border border-gray-200">
+        <div className="bg-amber-50 rounded-lg p-4 text-center text-gray-600 border border-amber-100">
           {emptyMessage}
         </div>
       </div>
@@ -322,15 +322,15 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
 
   return (
     <>
-      <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+      <div className="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-amber-200/50">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold text-indigo-900">{title}</h2>
+          <h2 className="text-xl font-semibold text-amber-900">{title}</h2>
         </div>
         
         {/* 가로 스크롤 카드 영역 */}
         <div 
           ref={scrollRef}
-          className={`overflow-x-auto scrollbar-hide ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none bg-gray-100 rounded-lg p-4 border border-gray-200`}
+          className={`overflow-x-auto scrollbar-hide ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none bg-amber-50 rounded-lg p-4 border border-amber-100`}
           onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -348,7 +348,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
             {vouchers.map((voucher) => (
               <div
                 key={voucher.id}
-                className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer flex-shrink-0 group w-[140px]"
+                className="bg-white/90 rounded-lg shadow-sm overflow-hidden border border-stone-200/60 hover:shadow-md transition-shadow cursor-pointer flex-shrink-0 group w-[140px]"
                 onClick={(e) => {
                   if (isDragging || dragDistance > 5) {
                     e.preventDefault();
@@ -391,7 +391,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                   {voucher.status === 'AVAILABLE' && (
                     <button
                       onClick={e => { e.stopPropagation(); handleUseVoucher(voucher.id); }}
-                      className="absolute bottom-1 right-1 bg-blue-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-blue-600 transition-colors z-20"
+                      className="absolute bottom-1 right-1 bg-amber-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-amber-600 transition-colors z-20"
                     >
                       사용완료
                     </button>
@@ -413,7 +413,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                   }`}>
                     <button
                       onClick={(e) => toggleLike(voucher.id, e)}
-                      className="p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90 transition-colors shadow-sm"
+                      className="p-1.5 rounded-full bg-white/85 backdrop-blur-sm hover:bg-white/95 transition-colors shadow-sm"
                     >
                       {likedVouchers[voucher.id] ? (
                         <HeartIconSolid className="w-5 h-5 text-red-500" />
@@ -435,7 +435,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
                 
                 {/* 카드 하단 정보 */}
                 <div className="p-2">
-                  <h3 className="font-medium text-gray-900 text-xs truncate" title={voucher.name}>
+                  <h3 className="font-medium text-stone-800 text-xs truncate" title={voucher.name}>
                     {voucher.name}
                   </h3>
                   <p className="text-xs text-gray-500 mt-1 truncate">
@@ -463,7 +463,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
       {/* 상세 정보 모달 */}
       {modalVoucher && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setModalVoucher(null)}>
-          <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="relative bg-white/95 backdrop-blur-md rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
             <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors" onClick={() => setModalVoucher(null)}>
               <XMarkIcon className="w-6 h-6" />
             </button>
@@ -483,7 +483,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
             
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 leading-6">
+                <h3 className="text-lg font-semibold text-stone-800 leading-6">
                   {modalVoucher.name}
                 </h3>
                 <button
@@ -500,7 +500,7 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
               
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-600">만료일</span>
-                <span className="text-sm font-medium text-gray-900">{modalVoucher.expiration}</span>
+                <span className="text-sm font-medium text-stone-800">{modalVoucher.expiration}</span>
               </div>
               
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
@@ -519,10 +519,10 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
               
               {/* 모달에서 사용완료/사용취소 버튼 */}
               {modalVoucher.status === 'AVAILABLE' && (
-                <div className="pt-4 border-t border-gray-100">
+                <div className="pt-4 border-t border-amber-100">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleUseVoucher(modalVoucher.id); setModalVoucher(null); }}
-                    className="w-full bg-blue-500 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
+                    className="w-full bg-amber-500 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-amber-600 transition-colors"
                   >
                     사용완료로 변경
                   </button>
@@ -530,10 +530,10 @@ const HorizontalVoucherCards: React.FC<HorizontalVoucherCardsProps> = ({
               )}
               
               {modalVoucher.status === 'USED' && (
-                <div className="pt-4 border-t border-gray-100">
+                <div className="pt-4 border-t border-amber-100">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleCancelUseVoucher(modalVoucher.id); setModalVoucher(null); }}
-                    className="w-full bg-gray-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-700 transition-colors"
+                    className="w-full bg-amber-700 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-amber-800 transition-colors"
                   >
                     사용취소
                   </button>

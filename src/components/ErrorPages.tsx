@@ -77,7 +77,7 @@ export const GeneralErrorPage = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center px-4 z-[60]">
+    <div className="fixed inset-0 flex items-center justify-center px-4 z-[60]">
       <div className="max-w-md w-full text-center">
         <ErrorGifticonIcon />
         
@@ -149,7 +149,7 @@ export const NetworkErrorPage = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center px-4 z-[60]">
+    <div className="fixed inset-0 flex items-center justify-center px-4 z-[60]">
       <div className="max-w-md w-full text-center">
         <NetworkErrorIcon />
         
@@ -185,8 +185,14 @@ export const NetworkErrorPage = ({
   );
 };
 
-// 인증 에러 페이지
-export const AuthErrorPage = () => {
+// 인증 에러 페이지 - 로그인 페이지와 통일감 있는 디자인
+interface AuthErrorPageProps {
+  title?: string;
+}
+
+export const AuthErrorPage = ({ 
+  title = "로그인이 필요해요"
+}: AuthErrorPageProps) => {
   const router = useRouter();
 
   const handleLogin = () => {
@@ -202,31 +208,45 @@ export const AuthErrorPage = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center px-4 z-[60]">
+    <div 
+      className="fixed inset-0 flex flex-col items-center justify-center px-6 z-[60]"
+      style={{
+        background: 'linear-gradient(135deg, #fef3c7 0%, #fef9e7 30%, #f0fdf4 70%, #f8fafc 100%)'
+      }}
+    >
       <div className="max-w-md w-full text-center">
-        {/* 자물쇠 아이콘 */}
-        <div className="mb-8">
-          <div className="w-20 h-20 mx-auto bg-yellow-100 rounded-full flex items-center justify-center">
-            <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* 자물쇠 아이콘 - 따뜻한 색상으로 변경 */}
+        <div className="mb-6">
+          <div className="w-24 h-24 mx-auto bg-amber-100 rounded-full flex items-center justify-center shadow-lg">
+            <svg className="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          로그인이 필요해요
+        {/* 제목 */}
+        <h1 className="text-3xl font-bold text-amber-900 mb-4" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          {title}
         </h1>
         
-        <p className="text-gray-600 mb-8 leading-relaxed">
-          이 페이지를 보려면 먼저 로그인해주세요.
-        </p>
+        {/* 메시지 - 두 줄로 표시 */}
+        <div className="text-amber-800 mb-8 leading-relaxed text-lg">
+          <p>이 서비스를 이용하려면 로그인이 필요합니다.</p>
+          <p className="mt-1">카카오 계정으로 간편하게 시작하세요!</p>
+        </div>
         
+        {/* 로그인 버튼 - 카카오 스타일 */}
         <button
           onClick={handleLogin}
-          className="w-full py-3 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition-colors"
+          className="w-full py-4 bg-[#FEE500] text-black font-bold rounded-lg text-center text-base shadow-[0_4px_12px_rgba(217,119,6,0.2),0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_16px_rgba(217,119,6,0.3),0_4px_8px_rgba(0,0,0,0.15)] transition-all duration-200"
         >
           로그인하러 가기
         </button>
+        
+        {/* 하단 안내 문구 */}
+        <p className="mt-8 text-sm text-amber-700/70">
+          로그인하면 기프티콘 관리와 그룹 공유 기능을 사용할 수 있어요
+        </p>
       </div>
     </div>
   );

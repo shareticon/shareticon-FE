@@ -161,10 +161,10 @@ function GroupsPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">그룹 목록을 불러오는 중...</p>
+          <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-stone-600">그룹 목록을 불러오는 중...</p>
         </div>
       </div>
     );
@@ -184,14 +184,14 @@ function GroupsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-20">
       <div className="container mx-auto max-w-2xl">
-        <header className="sticky top-0 bg-gray-50 z-10 p-4">
+        <header className="sticky top-0 z-10 p-4 backdrop-blur-sm bg-[#fffef9]/80">
           <div className="flex flex-col">
             <div className="flex justify-between items-center">
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold text-[#1F2B88]">그룹 목록</h1>
-                <p className="text-sm text-gray-600 mt-1">그룹에 참여하여 기프티콘을 공유해 보세요</p>
+                <h1 className="text-2xl font-bold text-amber-900">그룹 목록</h1>
+                <p className="text-sm text-stone-600 mt-1">그룹에 참여하여 기프티콘을 공유해 보세요</p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <button
@@ -200,7 +200,7 @@ function GroupsPageContent() {
                     setJoinError(null);
                     setJoinSuccessMessage(null);
                   }}
-                  className="inline-flex items-center text-blue-500 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                  className="inline-flex items-center text-amber-600 px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors"
                   title="그룹 참여하기"
                 >
                   <UserPlusIcon className="w-5 h-5" />
@@ -208,7 +208,7 @@ function GroupsPageContent() {
                 </button>
                 <Link
                   href="/groups/create"
-                  className="inline-flex items-center bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="inline-flex items-center bg-amber-500 text-white px-3 py-2 rounded-lg hover:bg-amber-600 transition-colors shadow-sm"
                   title="새 그룹 만들기"
                 >
                   <PlusIcon className="w-5 h-5" />
@@ -221,8 +221,8 @@ function GroupsPageContent() {
 
         <div className="p-4">
           {groups.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-              <p className="text-gray-600 mb-4">아직 참여 중인 그룹이 없습니다.</p>
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border border-amber-200/50 p-8 text-center">
+              <p className="text-stone-600 mb-4">아직 참여 중인 그룹이 없습니다.</p>
               <div className="flex gap-2 justify-center">
                 <button
                   onClick={() => {
@@ -230,14 +230,14 @@ function GroupsPageContent() {
                     setJoinError(null);
                     setJoinSuccessMessage(null);
                   }}
-                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                  className="text-amber-600 hover:text-amber-700 transition-colors font-medium"
                 >
                   참여하기
                 </button>
                 <span className="text-gray-400">또는</span>
                 <Link
                   href="/groups/create"
-                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                  className="text-amber-600 hover:text-amber-700 transition-colors font-medium"
                 >
                   새 그룹
                 </Link>

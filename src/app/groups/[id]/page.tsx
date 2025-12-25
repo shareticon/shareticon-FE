@@ -287,9 +287,9 @@ function GroupDetailPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="mt-4 text-gray-600">기프티콘 목록을 불러오는 중...</p>
         </div>
       </div>
@@ -310,23 +310,23 @@ function GroupDetailPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-20">
       <div className="container mx-auto max-w-2xl">
-        <header className="sticky top-0 bg-gray-50 z-10 p-4">
+        <header className="sticky top-0 z-10 p-4 backdrop-blur-sm bg-[#fffef9]/80">
           <div className="flex items-center justify-between">
             <div className="flex items-center min-w-0">
-              <Link href="/groups" className="mr-3 shrink-0 text-gray-600 hover:text-indigo-600 transition-colors">
+              <Link href="/groups" className="mr-3 shrink-0 text-gray-600 hover:text-gray-900 transition-colors">
                 <ArrowLeftIcon className="w-6 h-6" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-indigo-900">{groupTitle}</h1>
+                <h1 className="text-2xl font-bold text-amber-900">{groupTitle}</h1>
                 <p className="text-sm text-gray-600 mt-1">함께 사용하는 기프티콘</p>
               </div>
             </div>
             <div className="flex items-center gap-2 ml-4 shrink-0">
               <button 
                 onClick={() => setIsInviteModalOpen(true)}
-                className="inline-flex items-center text-blue-500 p-2 rounded-lg hover:bg-blue-50 md:px-3 md:py-2 transition-colors"
+                className="inline-flex items-center text-amber-600 p-2 rounded-lg hover:bg-amber-100 md:px-3 md:py-2 transition-colors"
                 title="멤버 초대"
               >
                 <UserPlusIcon className="w-6 h-6" />
@@ -334,7 +334,7 @@ function GroupDetailPageContent() {
               </button>
               <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="inline-flex items-center bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 md:px-3 md:py-2 transition-colors"
+                className="inline-flex items-center bg-amber-500 text-white p-2 rounded-lg hover:bg-amber-600 md:px-3 md:py-2 transition-colors shadow-sm"
                 title="기프티콘 추가"
               >
                 <PlusIcon className="w-5 h-5" />

@@ -377,23 +377,23 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 
   return (
     <div className="p-4">
-      <div className="sticky top-[88px] z-30 bg-white mb-3 w-full flex items-center min-h-[40px] border border-gray-200 shadow-sm rounded-lg">
-        <div className="relative flex-shrink-0 bg-white rounded-l-lg rounded-r-none" ref={filterRef}>
+      <div className="sticky top-[88px] z-30 bg-white/90 backdrop-blur-sm mb-3 w-full flex items-center min-h-[40px] border border-amber-200/50 shadow-sm rounded-lg">
+        <div className="relative flex-shrink-0 bg-white/90 rounded-l-lg rounded-r-none" ref={filterRef}>
           <button
             onClick={() => setFilterOpen(v => !v)}
-            className={`inline-flex items-center gap-1 px-2 sm:px-4 h-10 rounded-l-lg rounded-r-none border-0 border-r border-gray-200 bg-white text-gray-700 text-xs font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filterOpen ? 'z-30' : ''}`}
+            className={`inline-flex items-center gap-1 px-2 sm:px-4 h-10 rounded-l-lg rounded-r-none border-0 border-r border-amber-200/50 bg-white/90 text-stone-700 text-xs font-medium hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${filterOpen ? 'z-30' : ''}`}
             style={{ minWidth: 56 }}
             aria-label="필터 열기"
           >
-            <FunnelIcon className="w-4 h-4 text-gray-500" />
+            <FunnelIcon className="w-4 h-4 text-amber-600" />
             <span className="hidden sm:inline">필터</span>
             <ChevronDownIcon className={`w-4 h-4 ml-0.5 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
           </button>
           {filterOpen && (
-            <div className="absolute left-0 top-full w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-30 overflow-hidden mt-0.5">
+            <div className="absolute left-0 top-full w-80 bg-white/95 backdrop-blur-md border border-amber-200/50 rounded-2xl shadow-xl z-30 overflow-hidden mt-0.5">
               {/* 상태 필터 섹션 */}
-              <div className="px-4 py-3 border-b border-gray-100">
-                <div className="text-xs text-gray-500 font-medium mb-3">상태</div>
+              <div className="px-4 py-3 border-b border-amber-100">
+                <div className="text-xs text-stone-600 font-medium mb-3">상태</div>
                 <div className="space-y-2">
                   {(['AVAILABLE', 'USED', 'EXPIRED'] as VoucherStatus[]).map(status => (
                     <label
@@ -409,8 +409,8 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                         />
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                           localStatuses.has(status) 
-                            ? 'bg-blue-500 border-blue-500' 
-                            : 'border-gray-300 group-hover:border-gray-400'
+                            ? 'bg-amber-500 border-amber-500' 
+                            : 'border-stone-300 group-hover:border-amber-400'
                         }`}>
                           {localStatuses.has(status) && (
                             <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -429,17 +429,17 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 
               {/* 날짜 필터 섹션 */}
               <div className="px-4 py-3">
-                <div className="text-xs text-gray-500 font-medium mb-3">만료일 범위</div>
+                <div className="text-xs text-stone-600 font-medium mb-3">만료일 범위</div>
                 
                 {/* 시작일 */}
                 <div className="mb-3">
-                  <label className="block text-xs text-gray-600 mb-2">시작일</label>
+                  <label className="block text-xs text-stone-600 mb-2">시작일</label>
                   <div className="relative">
                     <input
                       type="date"
                       value={localDateFrom}
                       onChange={(e) => setLocalDateFrom(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 transition-all text-gray-700 font-medium"
+                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-amber-500 bg-amber-50 transition-all text-stone-700 font-medium"
                       style={{
                         colorScheme: 'light',
                         WebkitAppearance: 'none',
@@ -452,7 +452,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                       max={localDateTo || undefined}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
@@ -461,13 +461,13 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 
                 {/* 종료일 */}
                 <div className="mb-4">
-                  <label className="block text-xs text-gray-600 mb-2">종료일</label>
+                  <label className="block text-xs text-stone-600 mb-2">종료일</label>
                   <div className="relative">
                     <input
                       type="date"
                       value={localDateTo}
                       onChange={(e) => setLocalDateTo(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 transition-all text-gray-700 font-medium"
+                      className="w-full px-3 py-2.5 text-sm border-0 rounded-xl focus:ring-2 focus:ring-amber-500 bg-amber-50 transition-all text-stone-700 font-medium"
                       style={{
                         colorScheme: 'light',
                         WebkitAppearance: 'none',
@@ -480,7 +480,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                       min={localDateFrom || undefined}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                       </svg>
                     </div>
@@ -495,7 +495,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                       setLocalDateFrom(today.toISOString().split('T')[0]);
                       setLocalDateTo('');
                     }}
-                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-3 py-2 bg-amber-100 text-stone-700 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors"
                   >
                     오늘부터
                   </button>
@@ -507,7 +507,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                       setLocalDateFrom(today.toISOString().split('T')[0]);
                       setLocalDateTo(weekLater.toISOString().split('T')[0]);
                     }}
-                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-3 py-2 bg-amber-100 text-stone-700 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors"
                   >
                     일주일
                   </button>
@@ -519,7 +519,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                       setLocalDateFrom(today.toISOString().split('T')[0]);
                       setLocalDateTo(monthLater.toISOString().split('T')[0]);
                     }}
-                    className="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-3 py-2 bg-amber-100 text-stone-700 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors"
                   >
                     한달
                   </button>
@@ -529,13 +529,13 @@ export const VoucherList: React.FC<VoucherListProps> = ({
                 <div className="flex gap-2">
                   <button
                     onClick={handleFilterApply}
-                    className="flex-1 bg-blue-500 text-white text-sm font-medium py-2.5 rounded-xl hover:bg-blue-600 transition-colors"
+                    className="flex-1 bg-amber-500 text-white text-sm font-medium py-2.5 rounded-xl hover:bg-amber-600 transition-colors"
                   >
                     적용
                   </button>
                   <button
                     onClick={handleFilterCancel}
-                    className="px-4 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-200 transition-colors"
+                    className="px-4 bg-stone-100 text-stone-700 text-sm font-medium py-2.5 rounded-xl hover:bg-stone-200 transition-colors"
                   >
                     취소
                   </button>
@@ -544,7 +544,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             </div>
           )}
         </div>
-        <div className="flex gap-1 sm:gap-2 items-center bg-gray-50 min-h-[40px] px-2 sm:px-4 flex-1 rounded-r-lg rounded-l-none overflow-hidden">
+        <div className="flex gap-1 sm:gap-2 items-center bg-amber-50/50 min-h-[40px] px-2 sm:px-4 flex-1 rounded-r-lg rounded-l-none overflow-hidden">
           <div className="flex gap-1 sm:gap-2 items-center flex-wrap py-2">
             {Array.from(selectedStatuses).map(status => (
               <span key={status} className={`text-xs px-1.5 sm:px-2 py-1 rounded-full font-medium ${STATUS_BADGE[status as VoucherStatus]}`}>{STATUS_LABEL[status as VoucherStatus]}</span>
@@ -552,7 +552,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             
           {/* 날짜 필터 표시 */}
           {(filterCondition.startDay || filterCondition.endDay) && (
-            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+            <span className="text-xs px-2 py-1 bg-amber-100 text-amber-800 rounded-full font-medium">
               {filterCondition.startDay && filterCondition.endDay
                 ? `${filterCondition.startDay} ~ ${filterCondition.endDay}`
                 : filterCondition.startDay
@@ -562,11 +562,11 @@ export const VoucherList: React.FC<VoucherListProps> = ({
           )}
           </div>
           <div className="flex-1 min-w-2" />
-          <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+          <div className="flex items-center gap-1 text-stone-600 flex-shrink-0">
             <span className="text-xs hidden sm:inline">만료일</span>
             <button
               onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-              className="inline-flex items-center gap-0.5 hover:text-gray-900 transition-colors text-xs h-8 px-1 sm:px-2"
+              className="inline-flex items-center gap-0.5 hover:text-stone-800 transition-colors text-xs h-8 px-1 sm:px-2"
             >
               <span className="text-xs hidden sm:inline">{sortOrder === 'asc' ? '오름차순' : '내림차순'}</span>
               <span className="sm:hidden">{sortOrder === 'asc' ? '↑' : '↓'}</span>
@@ -591,7 +591,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
           {sortedVouchers.map((voucher) => (
             <div
             key={voucher.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group"
+            className="bg-white/90 rounded-lg shadow-sm overflow-hidden border border-stone-200/60 hover:shadow-md transition-shadow cursor-pointer group"
             onClick={() => {
               if (isValidImageUrl(voucher.presignedImage) && !imageErrors[voucher.id]) {
                 setModalVoucher(voucher);
@@ -654,7 +654,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               {voucher.status === 'AVAILABLE' && (
                 <button
                   onClick={e => { e.stopPropagation(); handleUseVoucher(voucher.id); }}
-                  className="absolute bottom-1 right-1 bg-blue-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-blue-600 transition-colors z-20"
+                  className="absolute bottom-1 right-1 bg-amber-500 text-white rounded px-2 py-0.5 text-xs font-medium shadow hover:bg-amber-600 transition-colors z-20"
                 >
                   사용완료
                 </button>
@@ -669,7 +669,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               )}
             </div>
             <div className="p-3">
-              <h3 className="font-medium text-gray-900 truncate" title={voucher.name}>
+              <h3 className="font-medium text-stone-800 truncate" title={voucher.name}>
                 {voucher.name}
               </h3>
               <p className="text-sm text-gray-500 mt-1">
@@ -705,7 +705,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
       {/* 상세 정보 모달 */}
       {modalVoucher && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setModalVoucher(null)}>
-          <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="relative bg-white/95 backdrop-blur-md rounded-lg shadow-xl max-w-sm w-full mx-4 p-6 flex flex-col" onClick={e => e.stopPropagation()}>
             <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors" onClick={() => setModalVoucher(null)}>
               <XMarkIcon className="w-6 h-6" />
             </button>
@@ -725,7 +725,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
             
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 leading-6">
+                <h3 className="text-lg font-semibold text-stone-800 leading-6">
                   {modalVoucher.name}
                 </h3>
                 <button
@@ -742,7 +742,7 @@ export const VoucherList: React.FC<VoucherListProps> = ({
               
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-600">만료일</span>
-                <span className="text-sm font-medium text-gray-900">{modalVoucher.expiration}</span>
+                <span className="text-sm font-medium text-stone-800">{modalVoucher.expiration}</span>
               </div>
               
               <div className="flex items-center justify-between py-2 border-t border-gray-100">

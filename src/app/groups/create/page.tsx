@@ -72,14 +72,14 @@ function CreateGroupPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-20">
       <div className="container mx-auto max-w-2xl">
-        <header className="sticky top-0 bg-gray-50 z-10 p-4">
+        <header className="sticky top-0 z-10 p-4 backdrop-blur-sm bg-[#fffef9]/80">
           <div className="flex items-center">
-            <Link href="/groups" className="mr-3 text-gray-600 hover:text-indigo-600 transition-colors">
+            <Link href="/groups" className="mr-3 text-gray-600 hover:text-gray-900 transition-colors">
               <ArrowLeftIcon className="w-6 h-6" />
             </Link>
-            <h1 className="text-2xl font-bold text-indigo-900">새 그룹 만들기</h1>
+            <h1 className="text-2xl font-bold text-amber-900">새 그룹 만들기</h1>
           </div>
         </header>
         
@@ -90,27 +90,29 @@ function CreateGroupPageContent() {
             </div>
           )}
           
-          <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              그룹명 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="예: 우리 가족"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
-              disabled={isSubmitting}
-            />
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-amber-200/50 shadow-sm">
+            <div className="space-y-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                그룹명 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="예: 우리 가족"
+                className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors bg-white/80"
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={!formData.name.trim() || isSubmitting}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            className="w-full bg-amber-500 text-white py-4 rounded-lg font-bold hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center shadow-[0_4px_12px_rgba(217,119,6,0.2)]"
           >
             {isSubmitting ? (
               <>

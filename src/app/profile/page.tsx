@@ -101,9 +101,9 @@ function ProfilePageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="mt-4 text-gray-600">프로필 정보를 불러오는 중...</p>
         </div>
       </div>
@@ -124,12 +124,12 @@ function ProfilePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-20">
       <div className="container mx-auto max-w-2xl">
-        <header className="sticky top-0 bg-gray-50 z-10 p-4">
+        <header className="sticky top-0 z-10 p-4 backdrop-blur-sm bg-[#fffef9]/80">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-blue-900">내 프로필</h1>
+              <h1 className="text-2xl font-bold text-amber-900">내 프로필</h1>
               <p className="text-sm text-gray-600 mt-1">
                 프로필 정보를 확인하고 관리하세요
               </p>
@@ -138,7 +138,7 @@ function ProfilePageContent() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                 title="로그아웃"
               >
                 <ArrowRightOnRectangleIcon className="w-6 h-6" />
@@ -147,15 +147,15 @@ function ProfilePageContent() {
           </div>
         </header>
         <div className="p-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-amber-100 overflow-hidden">
             <div className="px-6 py-6">
               <div className="text-center mb-6">
                 <div className="relative inline-block">
                   <div className="flex items-center justify-center gap-2">
-                    <h2 className="text-xl font-semibold text-blue-900 ml-10">{user ? user.nickName : '-'}</h2>
+                    <h2 className="text-xl font-semibold text-stone-800 ml-10">{user ? user.nickName : '-'}</h2>
                     <button
                       onClick={() => setIsEditModalOpen(true)}
-                      className="p-1 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-1 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
                       title="닉네임 수정"
                     >
                       <PencilSquareIcon className="w-5 h-5" />
@@ -165,15 +165,15 @@ function ProfilePageContent() {
                 <p className="text-gray-600 mt-1">{user ? user.email : '-'}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 mb-2">
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
+                <div className="bg-amber-50 p-4 rounded-lg text-center border border-amber-100">
                   <p className="text-sm text-gray-600">가입한 그룹</p>
-                  <p className="text-2xl font-semibold text-blue-900 mt-1">{user ? user.joinGroupCount : '-'}</p>
+                  <p className="text-2xl font-semibold text-stone-800 mt-1">{user ? user.joinGroupCount : '-'}</p>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
+                <div className="bg-amber-50 p-4 rounded-lg text-center border border-amber-100">
                   <p className="text-sm text-gray-600">
                     내가 등록한<br className="sm:hidden" /> 기프티콘
                   </p>
-                  <p className="text-2xl font-semibold text-blue-900 mt-1">{user ? user.ownedVoucherCount : '-'}</p>
+                  <p className="text-2xl font-semibold text-stone-800 mt-1">{user ? user.ownedVoucherCount : '-'}</p>
                 </div>
               </div>
             </div>

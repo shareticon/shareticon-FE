@@ -133,18 +133,18 @@ const GroupJoinRequests: React.FC = () => {
   if (error) {
     return (
       <section>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-sm border border-amber-200/50">
           <div className="text-center py-8">
             <div className="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
               <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">가입 신청을 불러올 수 없어요</h3>
+            <h3 className="text-lg font-medium text-stone-800 mb-2">가입 신청을 불러올 수 없어요</h3>
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
+              className="text-amber-600 hover:text-amber-700 font-medium"
             >
               다시 시도하기
             </button>
@@ -159,25 +159,25 @@ const GroupJoinRequests: React.FC = () => {
 
   return (
     <section>
-      <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-        <h2 className="text-xl font-semibold text-indigo-900 mb-4">그룹 가입 신청 관리</h2>
+      <div className="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-amber-200/50">
+        <h2 className="text-xl font-semibold text-amber-900 mb-4">그룹 가입 신청 관리</h2>
         <div className="space-y-6">
           {(() => {
             const elements = [];
             for (const group of groupRequests) {
               if (group.pendingMembers.length > 0) {
                 elements.push(
-                  <div key={group.targetGroupId} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
-                    <div className="flex items-center gap-2 mb-2 font-bold text-gray-800">
-                      <UserGroupIcon className="w-5 h-5 text-[#3730A3]" />
+                  <div key={group.targetGroupId} className="border border-amber-100 rounded-xl p-4 bg-amber-50">
+                    <div className="flex items-center gap-2 mb-2 font-bold text-stone-800">
+                      <UserGroupIcon className="w-5 h-5 text-amber-600" />
                       <span>{group.leaderGroupAlias}</span>
                     </div>
-                    <hr className="my-3 border-gray-200" />
-                    <ul className="divide-y divide-gray-100">
+                    <hr className="my-3 border-amber-200" />
+                    <ul className="divide-y divide-amber-100">
                       {group.pendingMembers.map(request => (
                         <li key={request.applyUserId} className="flex items-center justify-between py-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900">{request.applyUserNickname}</span>
+                            <span className="font-medium text-gray-800">{request.applyUserNickname}</span>
                             {request.isNew && (
                               <span className="ml-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-semibold">NEW</span>
                             )}
@@ -185,11 +185,11 @@ const GroupJoinRequests: React.FC = () => {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleAccept(group.targetGroupId, request.applyUserId)}
-                              className="px-3 py-1 rounded-md bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="px-3 py-1 rounded-md bg-amber-500 text-white text-sm font-medium hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                             >수락</button>
                             <button
                               onClick={() => handleReject(group.targetGroupId, request.applyUserId)}
-                              className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              className="px-3 py-1 rounded-md bg-amber-100 text-amber-800 text-sm font-medium hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
                             >거절</button>
                           </div>
                         </li>

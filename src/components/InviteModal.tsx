@@ -29,8 +29,8 @@ export default function InviteModal({ isOpen, onClose, groupName, inviteCode }: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl w-full max-w-md shadow-xl">
+        <div className="flex items-center justify-between p-4 border-b border-stone-200/60">
           <h2 className="text-xl font-semibold text-indigo-900">멤버 초대</h2>
           <button
             onClick={onClose}
@@ -46,8 +46,8 @@ export default function InviteModal({ isOpen, onClose, groupName, inviteCode }: 
           </p>
           
           <div className="relative">
-            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4 font-mono text-lg border border-gray-100">
-              <span className="tracking-wider text-gray-900">{inviteCode}</span>
+            <div className="flex items-center justify-between bg-amber-50/80 rounded-lg p-4 font-mono text-lg border border-amber-200/60">
+              <span className="tracking-wider text-amber-900">{inviteCode}</span>
               <button
                 onClick={handleCopy}
                 className={`p-2 rounded-lg transition-colors ${

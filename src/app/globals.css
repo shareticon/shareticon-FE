@@ -57,8 +57,14 @@ body.error-page-active nav[class*="fixed"][class*="bottom-0"] {
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 로그인 페이지와 일관된 따뜻한 색상 팔레트 */
+  --background: #fffef9;
+  --foreground: #292524;
+  --bg-warm-cream: #fefdfb;
+  --bg-warm-white: #fffef9;
+  --bg-card: #ffffff;
+  --text-warm-dark: #292524;
+  --text-warm-medium: #78716c;
 }
 
 @theme inline {
@@ -76,7 +82,8 @@ body.error-page-active nav[class*="fixed"][class*="bottom-0"] {
 }
 
 body {
-  background: #f7f8fa !important;
+  /* 따뜻하고 부드러운 크림 톤 배경 */
+  background: linear-gradient(135deg, #fefdfb 0%, #fffef9 50%, #fef9f5 100%) !important;
   min-height: 100vh;
   width: 100vw;
   overflow-x: hidden;
