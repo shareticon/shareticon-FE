@@ -2,6 +2,7 @@
 
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { logger } from '@/utils/logger';
 
 interface EditGroupNameModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export default function EditGroupNameModal({
       await onSubmit(newName);
       onClose();
     } catch (error) {
-      console.error('그룹명 수정 실패:', error);
+      logger.error('그룹명 수정 실패:', error);
       alert('그룹명 수정에 실패했습니다.');
     } finally {
       setIsSubmitting(false);

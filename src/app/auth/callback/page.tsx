@@ -3,6 +3,7 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setAccessToken } from '@/utils/auth';
+import { logger } from '@/utils/logger';
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -20,11 +21,11 @@ function AuthCallbackContent() {
           router.replace('/');
         } else {
           // 토큰이 없으면 에러 처리
-          console.error('토큰이 없습니다.');
+          logger.error('토큰이 없습니다.');
           router.replace('/login?error=no_token');
         }
       } catch (error) {
-        console.error('로그인 콜백 처리 에러:', error);
+        logger.error('로그인 콜백 처리 에러:', error);
         router.replace('/login?error=callback_failed');
       }
     };

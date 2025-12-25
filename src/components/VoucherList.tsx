@@ -130,19 +130,19 @@ export const VoucherList: React.FC<VoucherListProps> = ({
 
   // 서버에서 받은 isWishList 값으로 찜 상태 초기화
   useEffect(() => {
-    console.log('=== VoucherList 찜 상태 초기화 ===');
-    console.log('받은 vouchers:', vouchers);
+    logger.log('=== VoucherList 찜 상태 초기화 ===');
+    logger.log('받은 vouchers:', vouchers);
     
     const newState: Record<number, boolean> = {};
     vouchers.forEach(voucher => {
-      console.log(`Voucher ${voucher.id}: isWishList = ${voucher.isWishList} (type: ${typeof voucher.isWishList})`);
+      logger.log(`Voucher ${voucher.id}: isWishList = ${voucher.isWishList} (type: ${typeof voucher.isWishList})`);
       
       if (voucher.isWishList !== undefined) {
         newState[voucher.id] = voucher.isWishList;
       }
     });
     
-    console.log('설정할 찜 상태:', newState);
+    logger.log('설정할 찜 상태:', newState);
     setLikedVouchers(newState);
   }, [vouchers]);
 

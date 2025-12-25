@@ -3,6 +3,7 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
+import { logger } from '@/utils/logger';
 
 interface InviteModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export default function InviteModal({ isOpen, onClose, groupName, inviteCode }: 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.error('Failed to copy:', err);
     }
   };
 

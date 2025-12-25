@@ -62,10 +62,10 @@ function ProfilePageContent() {
         });
 
         if (!response.ok) {
-          console.warn(`로그아웃 API 요청 실패: ${response.status}`);
+          logger.warn(`로그아웃 API 요청 실패: ${response.status}`);
         }
       } catch (apiError) {
-        console.warn('로그아웃 API 요청 실패:', apiError);
+        logger.warn('로그아웃 API 요청 실패:', apiError);
         // API 실패해도 계속 진행
       }
 

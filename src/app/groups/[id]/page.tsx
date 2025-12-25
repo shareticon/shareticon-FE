@@ -106,16 +106,16 @@ function GroupDetailPageContent() {
       const data: VoucherResponse = await response.json();
       
       // 서버 응답 데이터 로그 추가
-      console.log('=== 서버 응답 데이터 ===');
-      console.log('Full response:', data);
+      logger.log('=== 서버 응답 데이터 ===');
+      logger.log('Full response:', data);
       
       if (data.content && data.content.length > 0) {
         const groupData = data.content[0];
-        console.log('Group data:', groupData);
-        console.log('Vouchers:', groupData.vouchers);
+        logger.log('Group data:', groupData);
+        logger.log('Vouchers:', groupData.vouchers);
         
         const processedVouchers = groupData.vouchers ? groupData.vouchers.map(voucher => {
-          console.log(`Voucher ${voucher.id} isWishList:`, voucher.isWishList);
+          logger.log(`Voucher ${voucher.id} isWishList:`, voucher.isWishList);
           return {
             ...voucher,
             presignedImage: voucher.presignedImage

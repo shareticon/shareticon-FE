@@ -38,7 +38,7 @@ function CreateGroupPageContent() {
         }),
       });
 
-      console.log('그룹 생성 응답 상태:', response.status);
+      logger.log('그룹 생성 응답 상태:', response.status);
 
       if (!response.ok) {
         const errorData = await response.text();
