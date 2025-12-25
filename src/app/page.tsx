@@ -6,7 +6,7 @@ import ErrorDisplay from '@/components/ErrorDisplay';
 import { NetworkErrorPage } from '@/components/ErrorPages';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import HorizontalVoucherCards from '@/components/HorizontalVoucherCards';
-import { fetchWithToken } from '@/utils/auth';
+import { fetchWithToken, getAccessToken } from '@/utils/auth';
 import { createApiUrl } from '@/utils/api';
 import { logger } from '@/utils/logger';
 
@@ -98,7 +98,11 @@ function HomeContent() {
 
   // 컴포넌트 마운트 시 찜한 기프티콘 조회
   useEffect(() => {
-    fetchFavoriteVouchers();
+    // 토큰이 있을 때만 API 호출 (ProtectedRoute가 인증을 보장)
+    const token = getAccessToken();
+    if (token) {
+      fetchFavoriteVouchers();
+    }
   }, []);
 
   if (isLoading) {
@@ -178,7 +182,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute redirectToLogin={true}>
       <HomeContent />
     </ProtectedRoute>
   );
